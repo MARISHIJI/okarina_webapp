@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  /* --- デザインシステム --- */
-  :root {
+/* --- デザインシステム --- */
+:root {
     --primary-color: #4a80e2;
     --primary-light: #eaf2ff;
     --background-color: #f7f9fc;
@@ -20,68 +20,73 @@
     --radius: 12px;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.05);
-  }
+}
 
-  /* --- 基本設定 --- */
-  * { box-sizing: border-box; }
-  body {
+/* --- 基本設定 --- */
+* {
+    box-sizing: border-box;
+}
+body {
     font-family: "Noto Sans JP", system-ui, sans-serif;
     margin: 0;
     background: var(--background-color);
     color: var(--text-color);
-  }
-  .container {
+    padding-bottom: 80px; /*モバイルナビボタンとのスペース確保*/
+}
+.container {
     max-width: 960px;
     margin: 0 auto;
     padding: 1rem 2rem;
-  }
+}
 
-  /* --- ヘッダー & ナビゲーション --- */
-  header {
+/* --- ヘッダー & ナビゲーション --- */
+header {
     background: var(--surface-color);
     border-bottom: 1px solid var(--border-color);
     padding: 1rem 0;
     margin-bottom: 2rem;
     text-align: center;
-  }
-  header h1 {
+}
+header h1 {
     font-size: 1.5rem;
     font-weight: 700;
     margin: 0 0 1rem 0;
     letter-spacing: 0.05em;
-  }
-  .main-nav {
+}
+.main-nav {
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-  }
-  .main-nav a {
+}
+.main-nav a {
     text-decoration: none;
     color: var(--text-light-color);
     font-weight: 500;
     padding: 0.5rem 1rem;
     border-radius: var(--radius);
     transition: background-color 0.3s, color 0.3s;
-  }
-  .main-nav a:hover {
+}
+.main-nav a:hover {
     color: var(--primary-color);
     background-color: var(--primary-light);
-  }
-  .main-nav a.current {
+}
+.main-nav a.current {
     color: #fff;
     background-color: var(--primary-color);
     font-weight: 700;
-  }
+}
 
-  main { flex: 1; }
-  main > p {
+main {
+    flex: 1;
+}
+main > p {
     color: var(--text-light-color);
     text-align: center;
     margin-bottom: 1.5rem;
-  }
+}
 
-  /* --- ピアノキーボードのスタイル --- */
-  .keyboard-section {
+/* --- ピアノキーボードのスタイル --- */
+.keyboard-section {
     background: var(--surface-color);
     border-radius: var(--radius);
     box-shadow: var(--shadow-light);
@@ -93,9 +98,8 @@
     padding-top: 0;
     padding-bottom: 0;
     transition: max-height 0s ease-out, opacity 0.4s ease-out, padding 0.5s ease-out, margin 0.5s ease-out;
-  }
-  /* ▼▼▼ 変更箇所 ▼▼▼ */
-  .keyboard-section.visible {
+}
+.keyboard-section.visible {
     max-height: 600px;
     opacity: 1;
     padding: 1rem;
@@ -104,11 +108,9 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-  }
+}
 
-  /* ▲▲▲ 変更箇所 ▲▲▲ */
-
-  #key-fingering-display {
+#key-fingering-display {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -118,38 +120,51 @@
     border-radius: var(--radius);
     padding: 1rem;
     border: 1px solid var(--border-color);
-  }
-  #key-fingering-display .card { box-shadow: none; padding: 0; background: transparent; }
-  #key-fingering-display span { color: var(--text-light-color); }
+}
+#key-fingering-display .card {
+    box-shadow: none;
+    padding: 0;
+    background: transparent;
+}
+#key-fingering-display span {
+    color: var(--text-light-color);
+}
 
-  .piano { position: relative; user-select: none; width: max-content; height: 160px; }
-  .white-key, .black-key {
+.piano {
+    position: relative;
+    user-select: none;
+    width: max-content;
+    height: 160px;
+}
+.white-key, .black-key {
     display: inline-block;
     cursor: pointer;
     border-radius: 4px;
     transition: background 0.2s;
-  }
-  .white-key {
+}
+.white-key {
     width: 36px;
     height: 160px;
     background: #fff;
     border: 1px solid #e0e0e0;
     position: relative;
     float: left;
-  }
-  .white-key.active {
+}
+.white-key.active {
     background: var(--primary-light);
     border-color: var(--primary-color);
-  }
-  .black-key {
+}
+.black-key {
     position: absolute;
     width: 24px;
     height: 100px;
     background: #333;
     z-index: 1;
-  }
-  .black-key.active { background: var(--primary-color); }
-  .key-label {
+}
+.black-key.active {
+    background: var(--primary-color);
+}
+.key-label {
     position: absolute;
     bottom: 8px;
     left: 0;
@@ -158,17 +173,17 @@
     font-size: 14px;
     color: var(--text-light-color);
     pointer-events: none;
-  }
-  
-  /* --- 運指表示ボード --- */
-  .board {
+}
+
+/* --- 運指表示ボード --- */
+.board {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     justify-items: center;
     margin-top: 2rem;
-  }
-  .card {
+}
+.card {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -181,23 +196,41 @@
     width: 100%;
     min-height: 150px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .card.rest-card { background: transparent; box-shadow: none; cursor: default !important; }
-  .card:not(.rest-card):hover {
+    user-select: none; /* ダブルタップ時のテキスト選択を防ぐ */
+}
+.card.rest-card {
+    background: transparent;
+    box-shadow: none;
+    cursor: default !important;
+}
+.card:not(.rest-card):hover {
     transform: translateY(-4px);
     box-shadow: 0 0 0 2px var(--primary-color), var(--shadow);
-  }
-  .card.active {
+}
+.card.active {
     box-shadow: 0 0 0 3px var(--primary-color);
     transform: translateY(-2px);
-  }
-  .card.rest-card.active { background: var(--primary-light); box-shadow: none; }
-  .card img { width: 100px; height: auto; }
-  .note-label { font-weight: 500; font-size: 1rem; }
+}
+.card.rest-card.active {
+    background: var(--primary-light);
+    box-shadow: none;
+}
+.card img {
+    width: 100px;
+    height: auto;
+}
+.note-label {
+    font-weight: 500;
+    font-size: 1rem;
+}
 
-  /* --- 入力フォーム --- */
-  .seq-wrapper { max-width: 600px; margin: 0 auto; text-align: center; }
-  #seq-input {
+/* --- 入力フォーム --- */
+.seq-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+#seq-input {
     width: 100%;
     padding: 0.8rem 1rem;
     border: 1px solid var(--border-color);
@@ -208,9 +241,13 @@
     font-family: inherit;
     resize: vertical;
     min-height: 80px;
-  }
-  #seq-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
-  .btn {
+}
+#seq-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+.btn {
     margin-top: 1rem;
     padding: 0.8rem 2rem;
     border: none;
@@ -221,11 +258,14 @@
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.2s;
-  }
-  .btn:hover { background-color: #3a70c2; transform: translateY(-2px); }
+}
+.btn:hover {
+    background-color: #3a70c2;
+    transform: translateY(-2px);
+}
 
-  /* --- 移調コントロール --- */
-  .transpose-controls {
+/* --- 移調コントロール --- */
+.transpose-controls {
     display: none;
     align-items: center;
     justify-content: center;
@@ -238,61 +278,130 @@
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
-  }
-  .transpose-controls .btn { margin-top: 0; }
-  .transpose-controls span {
+}
+.transpose-controls .btn {
+    margin-top: 0;
+}
+.transpose-controls span {
     font-size: 1.1rem;
     font-weight: 700;
     width: 100px;
     display: inline-block;
     text-align: center;
-  }
+}
 
-  /* --- レスポンシブ --- */
-  @media(max-width: 768px) {
-    .container { padding: 1rem; }
-    .board { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-    .card img { width: 80px; }
-  }
-  @media(max-width: 480px) {
-    .board { grid-template-columns: repeat(2, 1fr); }
-  }
+/* --- モバイル用ナビゲーションボタン --- */
+.mobile-nav-controls {
+    display: none; /* デフォルトは非表示 */
+    position: fixed;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    justify-content: space-between;
+    padding: 0 20px;
+    pointer-events: none;
+    z-index: 100;
+}
+.mobile-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    pointer-events: auto;
+    user-select: none;
+    opacity: 0.8;
+    transition: opacity 0.2s, transform 0.2s;
+}
+.mobile-nav-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+/* --- レスポンシブ --- */
+@media(max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    .board {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+    .card img {
+        width: 80px;
+    }
+    /* 移調コントロールのレイアウト調整とモバイルナビ表示 */
+    .transpose-controls {
+        flex-wrap: nowrap; /* 折り返しを防ぐ */
+        gap: 0.5rem;
+    }
+    .transpose-controls .btn {
+        padding: 0.8rem 1rem;
+        flex-shrink: 0;
+    }
+    .transpose-controls span {
+        flex-grow: 1;
+    }
+    .mobile-nav-controls {
+        display: flex;
+    }
+}
+@media(max-width: 480px) {
+    .board {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 </style>
 </head>
 <body>
+
 <header>
-  <div class="container">
-    <h1>Ocarina Fingering Trainer</h1>
-    <nav class="main-nav">
-      <a href="keyboard.html">鍵盤で探す</a>
-      <a href="sequence.html" class="current">音名で入力</a>
-      <a href="samples.html">サンプル曲</a>
-    </nav>
-  </div>
+    <div class="container">
+        <h1>Ocarina Fingering Trainer</h1>
+        <nav class="main-nav">
+            <a href="keyboard.html">鍵盤で探す</a>
+            <a href="sequence.html" class="current">音名で入力</a>
+            <a href="samples.html">サンプル曲</a>
+        </nav>
+    </div>
 </header>
 <div class="container">
-  <main>
-    <p>音名やドレミを入力すると運指がリアルタイムで表示されます。</p>
-    <div class="seq-wrapper">
-      <textarea id="seq-input" rows="4" placeholder="例: ド レ ミ ファ&#10;ソ ラ シ ド"></textarea>
-      <button id="toggle-keyboard-btn" class="btn">キーボードを表示</button>
-    </div>
-    
-    <div id="keyboard-section" class="keyboard-section">
-        <div id="key-fingering-display">
-          <span>キーを押してください</span>
+    <main>
+        <p>音名やドレミを入力すると運指がリアルタイムで表示されます。</p>
+        <div class="seq-wrapper">
+            <textarea id="seq-input" rows="4" placeholder="例: ド レ ミ ファ&#10;ソ ラ シ ド"></textarea>
+            <button id="toggle-keyboard-btn" class="btn">キーボードを表示</button>
         </div>
-        <div id="piano" class="piano"></div>
-    </div>
-    <div id="transpose-controls" class="transpose-controls">
-      <button id="transpose-down" class="btn">- Key</button>
-      <span id="transpose-level">Key: 0</span>
-      <button id="transpose-up" class="btn">+ Key</button>
-    </div>
+        
+        <div id="keyboard-section" class="keyboard-section">
+            <div id="key-fingering-display">
+                <span>キーを押してください</span>
+            </div>
+            <div id="piano" class="piano"></div>
+        </div>
+        <div id="transpose-controls" class="transpose-controls">
+            <button id="transpose-down" class="btn">- Key</button>
+            <span id="transpose-level">Key: 0</span>
+            <button id="transpose-up" class="btn">+ Key</button>
+        </div>
 
-    <div id="board-seq" class="board"></div>
-  </main>
+        <div id="board-seq" class="board"></div>
+    </main>
 </div>
+
+<div class="mobile-nav-controls">
+    <button id="mobile-prev-btn" class="mobile-nav-btn">◀</button>
+    <button id="mobile-next-btn" class="mobile-nav-btn">▶</button>
+</div>
+
 
 <script>
 /* ========= Web Audio & Data ========= */
@@ -307,9 +416,9 @@ const FINGERING_IMG = {'A':'fingering_A.png','A#':'fingering_As.png','B':'finger
 const SHARP_TO_FLAT = {'A#':'Bb','C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#2':'Bb2','C#2':'Db2','D#2':'Eb2'};
 const AMBIGUOUS_NOTE_MAP = {};
 OCARINA_RANGE.forEach(note => {
-  const baseWithSharp = note.replace('2', '');
-  if (!AMBIGUOUS_NOTE_MAP[baseWithSharp]) AMBIGUOUS_NOTE_MAP[baseWithSharp] = [];
-  AMBIGUOUS_NOTE_MAP[baseWithSharp].push(note);
+    const baseWithSharp = note.replace('2', '');
+    if (!AMBIGUOUS_NOTE_MAP[baseWithSharp]) AMBIGUOUS_NOTE_MAP[baseWithSharp] = [];
+    AMBIGUOUS_NOTE_MAP[baseWithSharp].push(note);
 });
 
 /* ========= DOM ========= */
@@ -323,6 +432,8 @@ const transposeLevel = document.getElementById('transpose-level');
 const transposeUp = document.getElementById('transpose-up');
 const transposeDown = document.getElementById('transpose-down');
 const toggleKeyboardBtn = document.getElementById('toggle-keyboard-btn');
+const mobilePrevBtn = document.getElementById('mobile-prev-btn');
+const mobileNextBtn = document.getElementById('mobile-next-btn');
 
 /* ========= 状態 ========= */
 let currentSequenceIndex = null;
@@ -331,234 +442,238 @@ let transposition = 0;
 
 /* ========= Audio ========= */
 function playNote(freq, dur = 0.45) {
-  if (!audioContext || !freq) return;
-  if (audioContext.state === 'suspended') audioContext.resume();
-  const osc = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(freq, audioContext.currentTime);
-  gain.gain.setValueAtTime(0.5, audioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + dur);
-  osc.connect(gain); gain.connect(audioContext.destination);
-  osc.start(); osc.stop(audioContext.currentTime + dur);
+    if (!audioContext || !freq) return;
+    if (audioContext.state === 'suspended') audioContext.resume();
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+    gain.gain.setValueAtTime(0.5, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + dur);
+    osc.connect(gain); gain.connect(audioContext.destination);
+    osc.start(); osc.stop(audioContext.currentTime + dur);
 }
 
 /* ========= UI Helper ========= */
 function createCard(note, label) {
-  const wrap = document.createElement('div');
-  wrap.className = 'card';
-  const lbl = document.createElement('div');
-  lbl.className = 'note-label';
-  lbl.textContent = label;
-  if (note === 'REST') {
-    wrap.classList.add('rest-card');
-    lbl.style.color = 'var(--text-light-color)';
-    wrap.appendChild(lbl);
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    const lbl = document.createElement('div');
+    lbl.className = 'note-label';
+    lbl.textContent = label;
+    if (note === 'REST') {
+        wrap.classList.add('rest-card');
+        lbl.style.color = 'var(--text-light-color)';
+        wrap.appendChild(lbl);
+        return wrap;
+    }
+    const img = document.createElement('img');
+    img.onerror = () => { img.style.display = 'none'; lbl.style.color = '#888'; lbl.textContent += ' (画像なし)'; };
+    if (note && FINGERING_IMG[note]) { img.src = IMG_PATH + FINGERING_IMG[note]; img.alt = `${note} fingering`; } else { img.style.display = 'none'; }
+    wrap.appendChild(lbl); wrap.appendChild(img);
     return wrap;
-  }
-  const img = document.createElement('img');
-  img.onerror = () => { img.style.display = 'none'; lbl.style.color = '#888'; lbl.textContent += ' (画像なし)'; };
-  if (note && FINGERING_IMG[note]) { img.src = IMG_PATH + FINGERING_IMG[note]; img.alt = `${note} fingering`; } else { img.style.display = 'none'; }
-  wrap.appendChild(lbl); wrap.appendChild(img);
-  return wrap;
 }
 
 /* --- 独立キーボード用の機能 --- */
 function highlightPianoKeys(note) {
-  pianoRoot.querySelectorAll('.white-key, .black-key').forEach(k => k.classList.toggle('active', k.dataset.note === note));
+    pianoRoot.querySelectorAll('.white-key, .black-key').forEach(k => k.classList.toggle('active', k.dataset.note === note));
 }
 
 function renderSingle(note) {
-  if (!(note in NOTE_FREQUENCIES)) return;
-  const staffKey = SHARP_TO_FLAT[note] || note;
-  highlightPianoKeys(note);
-  keyFingeringDisplay.innerHTML = '';
-  const card = createCard(note, staffKey.replace(/b/, '♭').replace(/#/, '♯'));
-  keyFingeringDisplay.appendChild(card);
-  playNote(NOTE_FREQUENCIES[note]);
+    if (!(note in NOTE_FREQUENCIES)) return;
+    const staffKey = SHARP_TO_FLAT[note] || note;
+    highlightPianoKeys(note);
+    keyFingeringDisplay.innerHTML = '';
+    const card = createCard(note, staffKey.replace(/b/, '♭').replace(/#/, '♯'));
+    keyFingeringDisplay.appendChild(card);
+    playNote(NOTE_FREQUENCIES[note]);
 }
 
 /* --- ピアノ生成ロジック --- */
 function buildPiano() {
-  const wasVisible = keyboardSection.classList.contains('visible');
-  if (!wasVisible) {
-    keyboardSection.style.visibility = 'hidden';
-    keyboardSection.classList.add('visible');
-  }
-  
-  pianoRoot.innerHTML = '';
-  const whiteKeysData = OCARINA_RANGE.filter(n => !n.includes('#'));
-  const blackKeysData = OCARINA_RANGE.filter(n => n.includes('#'));
-  const whiteKeyElements = {};
-  const noteToDoremi = { 'C': 'ド', 'D': 'レ', 'E': 'ミ', 'F': 'ファ', 'G': 'ソ', 'A': 'ラ', 'B': 'シ' };
-
-  whiteKeysData.forEach(noteName => {
-    const el = document.createElement('div');
-    el.className = 'white-key';
-    el.dataset.note = noteName;
-    el.addEventListener('click', () => renderSingle(noteName));
-    const baseNote = noteName.replace(/[0-9]/, '');
-    const doremiText = noteToDoremi[baseNote];
-    if (doremiText) {
-      const label = document.createElement('div');
-      label.className = 'key-label';
-      label.textContent = doremiText;
-      el.appendChild(label);
+    const wasVisible = keyboardSection.classList.contains('visible');
+    if (!wasVisible) {
+        keyboardSection.style.visibility = 'hidden';
+        keyboardSection.classList.add('visible');
     }
-    pianoRoot.appendChild(el);
-    whiteKeyElements[noteName] = el;
-  });
+    pianoRoot.innerHTML = '';
+    const whiteKeysData = OCARINA_RANGE.filter(n => !n.includes('#'));
+    const blackKeysData = OCARINA_RANGE.filter(n => n.includes('#'));
+    const whiteKeyElements = {};
+    const noteToDoremi = { 'C': 'ド', 'D': 'レ', 'E': 'ミ', 'F': 'ファ', 'G': 'ソ', 'A': 'ラ', 'B': 'シ' };
 
-  blackKeysData.forEach(noteName => {
-    const parentWhiteKeyName = noteName.replace('#', '');
-    const parentElement = whiteKeyElements[parentWhiteKeyName] || whiteKeyElements[parentWhiteKeyName.slice(0, -1)];
-    if (parentElement) {
-      const blackKeyElement = document.createElement('div');
-      blackKeyElement.className = 'black-key';
-      blackKeyElement.dataset.note = noteName;
-      const whiteKeyWidth = 36;
-      const blackKeyWidth = 24;
-      blackKeyElement.style.left = `${parentElement.offsetLeft + whiteKeyWidth - (blackKeyWidth / 2)}px`;
-      blackKeyElement.addEventListener('click', e => {
-        e.stopPropagation();
-        renderSingle(noteName);
-      });
-      pianoRoot.appendChild(blackKeyElement);
+    whiteKeysData.forEach(noteName => {
+        const el = document.createElement('div');
+        el.className = 'white-key';
+        el.dataset.note = noteName;
+        el.addEventListener('click', () => renderSingle(noteName));
+        const baseNote = noteName.replace(/[0-9]/, '');
+        const doremiText = noteToDoremi[baseNote];
+        if (doremiText) {
+            const label = document.createElement('div');
+            label.className = 'key-label';
+            label.textContent = doremiText;
+            el.appendChild(label);
+        }
+        pianoRoot.appendChild(el);
+        whiteKeyElements[noteName] = el;
+    });
+
+    blackKeysData.forEach(noteName => {
+        const parentWhiteKeyName = noteName.replace('#', '');
+        const parentElement = whiteKeyElements[parentWhiteKeyName] || whiteKeyElements[parentWhiteKeyName.slice(0, -1)];
+        if (parentElement) {
+            const blackKeyElement = document.createElement('div');
+            blackKeyElement.className = 'black-key';
+            blackKeyElement.dataset.note = noteName;
+            const whiteKeyWidth = 36;
+            const blackKeyWidth = 24;
+            blackKeyElement.style.left = `${parentElement.offsetLeft + whiteKeyWidth - (blackKeyWidth / 2)}px`;
+            blackKeyElement.addEventListener('click', e => {
+                e.stopPropagation();
+                renderSingle(noteName);
+            });
+            pianoRoot.appendChild(blackKeyElement);
+        }
+    });
+
+    if (!wasVisible) {
+        keyboardSection.classList.remove('visible');
+        keyboardSection.style.visibility = 'visible';
     }
-  });
-
-  if (!wasVisible) {
-    keyboardSection.classList.remove('visible');
-    keyboardSection.style.visibility = 'visible';
-  }
 }
 
 /* ========= Sequence Mode (テキスト入力関連) ========= */
 const ESCAPED_KEYS = Object.keys(INPUT_TO_NOTE).sort((a,b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
 function transposeNote(note, step) {
-  if (note === 'REST' || note === 'LINEBREAK') return note;
-  const idx = NOTE_TO_INDEX[note];
-  if (idx === undefined) return null;
-  const newIdx = idx + step;
-  if (newIdx < 0 || newIdx >= OCARINA_RANGE.length) return null;
-  return OCARINA_RANGE[newIdx];
+    if (note === 'REST' || note === 'LINEBREAK') return note;
+    const idx = NOTE_TO_INDEX[note];
+    if (idx === undefined) return null;
+    const newIdx = idx + step;
+    if (newIdx < 0 || newIdx >= OCARINA_RANGE.length) return null;
+    return OCARINA_RANGE[newIdx];
 }
 
 function selectSequenceNote(index) {
-  if (index < 0 || index >= originalSequence.length) return;
-  currentSequenceIndex = index;
-  let cardIndex = 0;
-  let dataIndex = 0;
-  while(dataIndex < index) {
-     if(originalSequence[dataIndex].note !== 'LINEBREAK') cardIndex++;
-     dataIndex++;
-  }
-  const cards = boardSeq.querySelectorAll('.card');
-  cards.forEach((c, i) => c.classList.toggle('active', i === cardIndex));
-  const item = originalSequence[index];
-  if (item.note === 'REST' || item.note === 'LINEBREAK') return;
-  const tNote = transposeNote(item.note, transposition);
-  if (tNote) {
-    playNote(NOTE_FREQUENCIES[tNote]);
-  }
+    if (index < 0 || index >= originalSequence.length) return;
+    currentSequenceIndex = index;
+    let cardIndex = 0;
+    let dataIndex = 0;
+    while(dataIndex < index) {
+        if(originalSequence[dataIndex].note !== 'LINEBREAK') cardIndex++;
+        dataIndex++;
+    }
+    const cards = boardSeq.querySelectorAll('.card');
+    cards.forEach((c, i) => c.classList.toggle('active', i === cardIndex));
+    const item = originalSequence[index];
+    if (item.note === 'REST' || item.note === 'LINEBREAK') return;
+    const tNote = transposeNote(item.note, transposition);
+    if (tNote) {
+        playNote(NOTE_FREQUENCIES[tNote]);
+    }
 }
 
 function renderTransposedSequence() {
-  boardSeq.innerHTML = '';
-  if (originalSequence.length === 0) {
-    transposeControls.style.display = 'none';
-    return;
-  }
-  transposeControls.style.display = 'flex';
-  transposeLevel.textContent = `Key: ${transposition > 0 ? '+' : ''}${transposition}`;
-  
-  originalSequence.forEach((item, index) => {
-    let card;
-    if (item.note === 'LINEBREAK') {
-       const brEl = document.createElement('div');
-       brEl.style.gridColumn = '1 / -1';
-       brEl.style.height = '0';
-       boardSeq.appendChild(brEl);
-       return;
+    boardSeq.innerHTML = '';
+    if (originalSequence.length === 0) {
+        transposeControls.style.display = 'none';
+        return;
     }
-    if (item.note === 'REST') {
-      card = createCard('REST', '休');
-    } else {
-      const tNote = transposeNote(item.note, transposition);
-      if (tNote) {
-        const disp = (SHARP_TO_FLAT[tNote] || tNote).replace(/b/, '♭').replace(/#/, '♯');
-        const lbl = item.lyric ? `${disp}（${item.lyric}）` : disp;
-        card = createCard(tNote, lbl);
-      } else {
-        const lbl = item.lyric ? `音域外（${item.lyric}）` : '音域外';
-        card = createCard(null, lbl);
-      }
-    }
-    card.style.cursor = 'pointer';
-    card.addEventListener('click', () => selectSequenceNote(index));
-    card.addEventListener('contextmenu', e => {
-      e.preventDefault();
-      const currentItem = originalSequence[index];
-      if (currentItem.note === 'REST' || currentItem.note === 'LINEBREAK') return;
-      const currentNote = currentItem.note;
-      const baseNote = currentNote.replace('2', '');
-      const octaveOptions = AMBIGUOUS_NOTE_MAP[baseNote];
-      if (octaveOptions && octaveOptions.length > 1) {
-        const currentIndex = octaveOptions.indexOf(currentNote);
-        const nextIndex = (currentIndex + 1) % octaveOptions.length;
-        originalSequence[index].note = octaveOptions[nextIndex];
-        renderTransposedSequence();
-      }
+    transposeControls.style.display = 'flex';
+    transposeLevel.textContent = `Key: ${transposition > 0 ? '+' : ''}${transposition}`;
+    
+    originalSequence.forEach((item, index) => {
+        let card;
+        if (item.note === 'LINEBREAK') {
+            const brEl = document.createElement('div');
+            brEl.style.gridColumn = '1 / -1';
+            brEl.style.height = '0';
+            boardSeq.appendChild(brEl);
+            return;
+        }
+        if (item.note === 'REST') {
+            card = createCard('REST', '休');
+        } else {
+            const tNote = transposeNote(item.note, transposition);
+            if (tNote) {
+                const disp = (SHARP_TO_FLAT[tNote] || tNote).replace(/b/, '♭').replace(/#/, '♯');
+                const lbl = item.lyric ? `${disp}（${item.lyric}）` : disp;
+                card = createCard(tNote, lbl);
+            } else {
+                const lbl = item.lyric ? `音域外（${item.lyric}）` : '音域外';
+                card = createCard(null, lbl);
+            }
+        }
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => selectSequenceNote(index));
+        
+        // オクターブ変更ロジック(右クリックとダブルクリック)
+        const changeOctave = (e) => {
+            e.preventDefault();
+            const currentItem = originalSequence[index];
+            if (currentItem.note === 'REST' || currentItem.note === 'LINEBREAK') return;
+            const currentNote = currentItem.note;
+            const baseNote = currentNote.replace('2', '');
+            const octaveOptions = AMBIGUOUS_NOTE_MAP[baseNote];
+            if (octaveOptions && octaveOptions.length > 1) {
+                const currentIndexInOptions = octaveOptions.indexOf(currentNote);
+                const nextIndex = (currentIndexInOptions + 1) % octaveOptions.length;
+                originalSequence[index].note = octaveOptions[nextIndex];
+                renderTransposedSequence();
+            }
+        };
+        card.addEventListener('contextmenu', changeOctave); // PC: 右クリック
+        card.addEventListener('dblclick', changeOctave); // Mobile: ダブルクリック
+
+        boardSeq.appendChild(card);
     });
-    boardSeq.appendChild(card);
-  });
-  if (currentSequenceIndex !== null && currentSequenceIndex < originalSequence.length) {
-    selectSequenceNote(currentSequenceIndex);
-  } else {
-    const firstValid = originalSequence.findIndex(item => transposeNote(item.note, transposition) !== null && item.note !== 'REST' && item.note !== 'LINEBREAK');
-    if (firstValid !== -1) selectSequenceNote(firstValid);
-  }
+    if (currentSequenceIndex !== null && currentSequenceIndex < originalSequence.length) {
+        selectSequenceNote(currentSequenceIndex);
+    } else {
+        const firstValid = originalSequence.findIndex(item => transposeNote(item.note, transposition) !== null && item.note !== 'REST' && item.note !== 'LINEBREAK');
+        if (firstValid !== -1) selectSequenceNote(firstValid);
+    }
 }
 
 function parseAndResolveSequence(rawText) {
-  if (!rawText.trim()) return [];
-  const tokenRegex = new RegExp(`(${ESCAPED_KEYS.join('|')})(?:（([^）]+)）)?|([ 　]+)|(\\n)`, 'gi');
-  const matches = [...rawText.matchAll(tokenRegex)];
-  if (matches.length === 0) {
-    boardSeq.innerHTML = '<p style="grid-column:1/-1;color:var(--text-light-color);">認識できる音名がありませんでした。</p>';
-    return [];
-  }
-  let intermediateSequence = matches.map(m => {
-    const [_, noteToken, lyricToken, spaceToken, newlineToken] = m;
-    if (newlineToken) return { note: 'LINEBREAK' };
-    if (spaceToken) return { note: 'REST' };
-    const noteName = (noteToken || '').toUpperCase().replace('♭', 'b').replace('♯', '#');
-    const note = INPUT_TO_NOTE[noteName] || INPUT_TO_NOTE[noteToken];
-    if (!note) return null;
-    const potentialNotes = AMBIGUOUS_NOTE_MAP[note.replace('2','')];
-    const isAmbiguous = potentialNotes && potentialNotes.length > 1 && !noteToken.includes('2') && !noteToken.includes('２');
-    return { note: note, lyric: lyricToken || '', isAmbiguous: isAmbiguous, potentialNotes: potentialNotes };
-  }).filter(Boolean);
-
-  intermediateSequence.forEach((currentItem, i) => {
-    if (!currentItem.isAmbiguous) return;
-    let referenceNote = null;
-    for (let j = i - 1; j >= 0; j--) { if (intermediateSequence[j].note !== 'REST' && intermediateSequence[j].note !== 'LINEBREAK') { referenceNote = intermediateSequence[j].note; break; } }
-    if (!referenceNote) { for (let j = i + 1; j < intermediateSequence.length; j++) { if (intermediateSequence[j].note !== 'REST' && intermediateSequence[j].note !== 'LINEBREAK') { referenceNote = intermediateSequence[j].note; break; } } }
-    if (referenceNote) {
-      const refIndex = NOTE_TO_INDEX[referenceNote];
-      if (refIndex === undefined) return;
-      let bestNote = currentItem.note, minDistance = Infinity;
-      currentItem.potentialNotes.forEach(pNote => {
-        const distance = Math.abs(NOTE_TO_INDEX[pNote] - refIndex);
-        if (distance < minDistance) { minDistance = distance; bestNote = pNote; }
-      });
-      currentItem.note = bestNote;
-      currentItem.isAmbiguous = false;
+    if (!rawText.trim()) return [];
+    const tokenRegex = new RegExp(`(${ESCAPED_KEYS.join('|')})(?:（([^）]+)）)?|([ 　]+)|(\\n)`, 'gi');
+    const matches = [...rawText.matchAll(tokenRegex)];
+    if (matches.length === 0) {
+        boardSeq.innerHTML = '<p style="grid-column:1/-1;color:var(--text-light-color);">認識できる音名がありませんでした。</p>';
+        return [];
     }
-  });
-  return intermediateSequence.map(item => ({ note: item.note, lyric: item.lyric || '' }));
+    let intermediateSequence = matches.map(m => {
+        const [_, noteToken, lyricToken, spaceToken, newlineToken] = m;
+        if (newlineToken) return { note: 'LINEBREAK' };
+        if (spaceToken) return { note: 'REST' };
+        const noteName = (noteToken || '').toUpperCase().replace('♭', 'b').replace('♯', '#');
+        const note = INPUT_TO_NOTE[noteName] || INPUT_TO_NOTE[noteToken];
+        if (!note) return null;
+        const potentialNotes = AMBIGUOUS_NOTE_MAP[note.replace('2','')];
+        const isAmbiguous = potentialNotes && potentialNotes.length > 1 && !noteToken.includes('2') && !noteToken.includes('２');
+        return { note: note, lyric: lyricToken || '', isAmbiguous: isAmbiguous, potentialNotes: potentialNotes };
+    }).filter(Boolean);
+
+    intermediateSequence.forEach((currentItem, i) => {
+        if (!currentItem.isAmbiguous) return;
+        let referenceNote = null;
+        for (let j = i - 1; j >= 0; j--) { if (intermediateSequence[j].note !== 'REST' && intermediateSequence[j].note !== 'LINEBREAK') { referenceNote = intermediateSequence[j].note; break; } }
+        if (!referenceNote) { for (let j = i + 1; j < intermediateSequence.length; j++) { if (intermediateSequence[j].note !== 'REST' && intermediateSequence[j].note !== 'LINEBREAK') { referenceNote = intermediateSequence[j].note; break; } } }
+        if (referenceNote) {
+            const refIndex = NOTE_TO_INDEX[referenceNote];
+            if (refIndex === undefined) return;
+            let bestNote = currentItem.note, minDistance = Infinity;
+            currentItem.potentialNotes.forEach(pNote => {
+                const distance = Math.abs(NOTE_TO_INDEX[pNote] - refIndex);
+                if (distance < minDistance) { minDistance = distance; bestNote = pNote; }
+            });
+            currentItem.note = bestNote;
+            currentItem.isAmbiguous = false;
+        }
+    });
+    return intermediateSequence.map(item => ({ note: item.note, lyric: item.lyric || '' }));
 }
 
 function updateApp() {
@@ -572,49 +687,65 @@ function updateApp() {
     renderTransposedSequence();
 }
 
+// シーケンス移動のための共通関数
+function navigateSequence(direction) { // directionは -1 (前へ) または 1 (次へ)
+    if (currentSequenceIndex === null || originalSequence.length === 0) return;
+    
+    let nextIndex = currentSequenceIndex;
+    do {
+        nextIndex += direction;
+    } while (
+        nextIndex >= 0 &&
+        nextIndex < originalSequence.length &&
+        (originalSequence[nextIndex].note === 'REST' || originalSequence[nextIndex].note === 'LINEBREAK')
+    );
+
+    if (nextIndex >= 0 && nextIndex < originalSequence.length) {
+        selectSequenceNote(nextIndex);
+    }
+}
+
+
 /* ========= イベントリスナー ========= */
 transposeUp.addEventListener('click', () => { transposition++; renderTransposedSequence(); });
 transposeDown.addEventListener('click', () => { transposition--; renderTransposedSequence(); });
 
+mobilePrevBtn.addEventListener('click', () => navigateSequence(-1));
+mobileNextBtn.addEventListener('click', () => navigateSequence(1));
+
+
 document.addEventListener('keydown', e => {
-  if (document.activeElement === seqInput) return;
-  const isLeft = e.key === 'ArrowLeft';
-  const isRight = e.key === 'ArrowRight';
-  if (!isLeft && !isRight) return;
-  if (currentSequenceIndex === null || originalSequence.length === 0) return;
-  e.preventDefault();
-  const newIndex = currentSequenceIndex + (isLeft ? -1 : 1);
-  if (newIndex >= 0 && newIndex < originalSequence.length) {
-     let next = newIndex;
-     while(next >= 0 && next < originalSequence.length) {
-         const note = originalSequence[next].note;
-         if (note !== 'REST' && note !== 'LINEBREAK') { selectSequenceNote(next); break; }
-         next += (isLeft ? -1 : 1);
-     }
-  }
+    if (document.activeElement === seqInput) return;
+    if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateSequence(-1);
+    } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateSequence(1);
+    }
 });
 
 window.addEventListener('load', () => {
-  buildPiano();
-  const params = new URLSearchParams(window.location.search);
-  const sequence = params.get('sequence');
-  if (sequence) {
-    seqInput.value = decodeURIComponent(sequence);
-  }
-  transposition = 0;
-  updateApp();
+    buildPiano();
+    const params = new URLSearchParams(window.location.search);
+    const sequence = params.get('sequence');
+    if (sequence) {
+        seqInput.value = decodeURIComponent(sequence);
+    }
+    transposition = 0;
+    updateApp();
 });
 
 seqInput.addEventListener('input', updateApp);
 
 toggleKeyboardBtn.addEventListener('click', () => {
-  keyboardSection.classList.toggle('visible');
-  if (keyboardSection.classList.contains('visible')) {
-    toggleKeyboardBtn.textContent = 'キーボードを非表示';
-  } else {
-    toggleKeyboardBtn.textContent = 'キーボードを表示';
-    highlightPianoKeys(null);
-  }
+    keyboardSection.classList.toggle('visible');
+    if (keyboardSection.classList.contains('visible')) {
+        toggleKeyboardBtn.textContent = 'キーボードを非表示';
+    } else {
+        toggleKeyboardBtn.textContent = 'キーボードを表示';
+        highlightPianoKeys(null);
+    }
 });
 </script>
 </body>
