@@ -11,16 +11,16 @@
   :root{--primary:#0066ff;--bg:#f4f7fe;--surface:#ffffff;--radius:12px;}
   *{box-sizing:border-box;}
   body{font-family:"Noto Sans JP",system-ui,sans-serif;margin:0;background:var(--bg);color:#222;
-       display:flex;flex-direction:column;min-height:100vh;}
+      display:flex;flex-direction:column;min-height:100vh;}
   header{background:var(--surface);box-shadow:0 2px 6px rgba(0,0,0,.05);
-         padding:1rem 2rem;display:flex;align-items:center;gap:1rem;}
+        padding:1rem 2rem;display:flex;align-items:center;gap:1rem;}
   header h1{font-size:1.4rem;font-weight:600;margin:0;}
 
   /* ---------- Tabs ---------- */
   .tabs{display:flex;gap:.2rem;margin-top:1rem;}
   .tabs button{flex:1;border:none;background:var(--surface);padding:.6rem 1rem;
-               border-radius:var(--radius) var(--radius) 0 0;cursor:pointer;font-weight:600;
-               color:#444;transition:background .2s,color .2s;}
+              border-radius:var(--radius) var(--radius) 0 0;cursor:pointer;font-weight:600;
+              color:#444;transition:background .2s,color .2s;}
   .tabs button.active{background:var(--primary);color:#fff;}
 
   main{flex:1;padding:0 2rem 2rem;}
@@ -41,8 +41,13 @@
 
   /* ---------- Fingering board ---------- */
   .board{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem;justify-items:center;margin-top:1.5rem;}
-  .card{display:flex;flex-direction:column;align-items:center;gap:.4rem;}
+  .card{display:flex;flex-direction:column;align-items:center;gap:.4rem; padding: 5px; box-sizing: border-box;}
   .card img{width:120px;height:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15));}
+  .card.active {
+    outline: 2px solid var(--primary);
+    border-radius: 8px;
+    background: #f0f6ff;
+  }
 
   .note-label{font-weight:600;}
 
@@ -51,18 +56,10 @@
   #seq-input{width:100%;padding:.6rem;border:1px solid #aaa;border-radius:6px;font-size:1rem;}
   .btn{margin-top:.8rem;padding:.6rem 1.2rem;border:none;border-radius:6px;background:var(--primary);color:#fff;font-weight:600;cursor:pointer;}
 
-  /* Begen: 変更・追加 */
-  .transpose-controls{
-    display:none;
-    align-items:center;
-    justify-content:center;
-    gap:1rem;
-    margin-top:1.5rem;
-    text-align:center;
-  }
+  /* Transpose controls */
+  .transpose-controls{display:none;align-items:center;justify-content:center;gap:1rem;margin-top:1.5rem;text-align:center;}
   .transpose-controls .btn{margin-top:0;}
   #transpose-level{font-size:1.1rem;font-weight:600;width:80px;display:inline-block;}
-  /* End: 変更・追加 */
 
   /* ---------- Responsive ---------- */
   @media(max-width:768px){.card img{width:100px;}}
@@ -82,7 +79,7 @@
   </div>
 
   <section id="page-key" class="active">
-    <p>ピアノ鍵盤をクリックすると、その音の指使いと五線譜が表示されます。</p>
+    <p>鍵盤をクリックするとハイライトされ、キーボードの ← → で隣へ移動します。</p>
 
     <div class="piano-staff">
       <div id="piano" class="piano"></div>
@@ -93,12 +90,11 @@
   </section>
 
   <section id="page-seq">
-    <p>「ミ♭」「Eb」「ミb」などフラット表記も入力できます。ひらがな（例:「れ」「ふぁ」）にも対応。</p>
+    <p>「み♭」「Eb」やひらがなも入力可。Enter またはボタンで変換。表示された運指はクリックや←→キーで選択できます。</p>
     <div class="seq-wrapper">
       <input id="seq-input" placeholder="例: み♭（き） ふぁ（み） そ♭（ー）" />
       <button id="seq-btn" class="btn">変換</button>
     </div>
-    
     <div id="transpose-controls" class="transpose-controls">
       <button id="transpose-down" class="btn">- Key</button>
       <span id="transpose-level">Key: 0</span>
@@ -110,62 +106,49 @@
 
 <script>
 /* ========= Web Audio ========= */
-let audioContext;
-try{audioContext=new(window.AudioContext||window.webkitAudioContext)();}catch(e){console.error('Web Audio API unsupported');}
+let audioContext;try{audioContext=new(window.AudioContext||window.webkitAudioContext)();}catch(e){console.error('Web Audio API unsupported');}
 
-/* ========= Data ========= */
-const NOTE_FREQUENCIES={C:261.63,"C#":277.18,D:293.66,"D#":311.13,E:329.63,F:349.23,"F#":369.99,
-G:392.00,"G#":415.30,A:440.00,"A#":466.16,B:493.88,C2:523.25};
-
-/* 入力文字列 → 内部ノート名  ひらがなサポート付き */
-const INPUT_TO_NOTE={
-  // ひらがな
-  "ど":"C","れ":"D","み":"E","ふぁ":"F","そ":"G","ら":"A","し":"B","ど2":"C2",
-  "ど#":"C#","ど♯":"C#","れ#":"D#","れ♯":"D#","ふぁ#":"F#","ふぁ♯":"F#",
-  "そ#":"G#","そ♯":"G#","ら#":"A#","ら♯":"A#",
-  "れb":"C#","れ♭":"C#","みb":"D#","み♭":"D#","そb":"F#","そ♭":"F#",
-  "らb":"G#","ら♭":"G#","しb":"A#","し♭":"A#",
-
-  // カタカナ
-  "ド":"C","レ":"D","ミ":"E","ファ":"F","ソ":"G","ラ":"A","シ":"B","ド2":"C2",
-  "ド#":"C#","ド♯":"C#","レ#":"D#","レ♯":"D#","ファ#":"F#","ファ♯":"F#",
-  "ソ#":"G#","ソ♯":"G#","ラ#":"A#","ラ♯":"A#",
-  "レb":"C#","レ♭":"C#","ミb":"D#","ミ♭":"D#","ソb":"F#","ソ♭":"F#",
-  "ラb":"G#","ラ♭":"G#","シb":"A#","シ♭":"A#",
-
-  // ローマ字 & アルファベット
-  C:"C",B:"B","C#":"C#","DB":"C#","D":"D","D#":"D#","EB":"D#","E":"E","F":"F","F#":"F#","GB":"F#",
-  G:"G","G#":"G#","AB":"G#","A":"A","A#":"A#","BB":"A#","C2":"C2"
-};
-
-/* ノート名 → 運指画像 */
-const IMG_PATH='./img/';
-const FINGERING_IMG={
-  C:'fingering_C.png',"C#":'fingering_Cs.png',D:'fingering_D.png',"D#":'fingering_Ds.png',
-  E:'fingering_E.png',F:'fingering_F.png',"F#":'fingering_Fs.png',G:'fingering_G.png',
-  "G#":'fingering_Gs.png',A:'fingering_A.png',"A#":'fingering_As.png',B:'fingering_B.png',C2:'fingering_C2.png'
-};
-
-/* 五線譜画像 */
-const STAFF_IMG={
-  C:'staff_C.png',D:'staff_D.png',E:'staff_E.png',F:'staff_F.png',G:'staff_G.png',A:'staff_A.png',B:'staff_B.png',C2:'staff_C2.png',
-  "C#":'staff_Cs.png',"D#":'staff_Ds.png',"F#":'staff_Fs.png',"G#":'staff_Gs.png',"A#":'staff_As.png',
-  Db:'staff_Db.png',Eb:'staff_Eb.png',Gb:'staff_Gb.png',Ab:'staff_Ab.png',Bb:'staff_Bb.png'
-};
-const STAFF_BLANK='staff_blank.png';
-const SHARP_TO_FLAT={"C#":"Db","D#":"Eb","F#":"Gb","G#":"Ab","A#":"Bb"};
-
-/* ========= Transposition Data ========= */
+/* ========= Constants ========= */
+const NOTE_FREQUENCIES={C:261.63,"C#":277.18,D:293.66,"D#":311.13,E:329.63,F:349.23,"F#":369.99,G:392,"G#":415.3,A:440,"A#":466.16,B:493.88,C2:523.25};
 const OCARINA_RANGE=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B","C2"];
 const NOTE_TO_INDEX=Object.fromEntries(OCARINA_RANGE.map((n,i)=>[n,i]));
 
-let originalSequence=[];let transposition=0;
+/* ========= Mappings: Input token -> note ========= */
+const INPUT_TO_NOTE={
+  // ひらがな
+  "ど":"C","れ":"D","み":"E","ふぁ":"F","そ":"G","ら":"A","し":"B","ど2":"C2",
+  "ど#":"C#","ど♯":"C#","れ#":"D#","れ♯":"D#","ふぁ#":"F#","ふぁ♯":"F#","そ#":"G#","そ♯":"G#","ら#":"A#","ら♯":"A#",
+  "れb":"C#","れ♭":"C#","みb":"D#","み♭":"D#","そb":"F#","そ♭":"F#","らb":"G#","ら♭":"G#","しb":"A#","し♭":"A#",
+  // カタカナ
+  "ド":"C","レ":"D","ミ":"E","ファ":"F","ソ":"G","ラ":"A","シ":"B","ド2":"C2",
+  "ド#":"C#","ド♯":"C#","レ#":"D#","レ♯":"D#","ファ#":"F#","ファ♯":"F#","ソ#":"G#","ソ♯":"G#","ラ#":"A#","ラ♯":"A#",
+  "レb":"C#","レ♭":"C#","ミb":"D#","ミ♭":"D#","ソb":"F#","そ♭":"F#","ラb":"G#","ラ♭":"G#","シb":"A#","シ♭":"A#",
+  // ローマ字・英字
+  C:"C",B:"B","C#":"C#","DB":"C#","D":"D","D#":"D#","EB":"D#","E":"E","F":"F","F#":"F#","GB":"F#",G:"G","G#":"G#","AB":"G#",A:"A","A#":"A#","BB":"A#",C2:"C2"
+};
 
-/* ========= Helpers ========= */
-function playNote(freq,dur=.5){
+/* ========= Assets ========= */
+const IMG_PATH='./img/'; // 画像へのパス。 './' は同じフォルダを指します。
+const FINGERING_IMG={C:'fingering_C.png',"C#":'fingering_Cs.png',D:'fingering_D.png',"D#":'fingering_Ds.png',E:'fingering_E.png',F:'fingering_F.png',"F#":'fingering_Fs.png',G:'fingering_G.png',"G#":'fingering_Gs.png',A:'fingering_A.png',"A#":'fingering_As.png',B:'fingering_B.png',C2:'fingering_C2.png'};
+const STAFF_IMG={C:'staff_C.png',D:'staff_D.png',E:'staff_E.png',F:'staff_F.png',G:'staff_G.png',A:'staff_A.png',B:'staff_B.png',C2:'staff_C2.png',"C#":'staff_Cs.png',"D#":'staff_Ds.png',"F#":'staff_Fs.png',"G#":'staff_Gs.png',"A#":'staff_As.png',Db:'staff_Db.png',Eb:'staff_Eb.png',Gb:'staff_Gb.png',Ab:'staff_Ab.png',Bb:'staff_Bb.png'};
+const STAFF_BLANK='staff_blank.png';
+const SHARP_TO_FLAT={"C#":"Db","D#":"Eb","F#":"Gb","G#":"Ab","A#":"Bb"};
+
+/* ========= DOM Elements ========= */
+const pianoRoot=document.getElementById('piano');
+const boardKey=document.getElementById('board-key');
+const staffImg=document.getElementById('staff-img');
+const tabs={key:{btn:document.getElementById('tab-key'),page:document.getElementById('page-key')},seq:{btn:document.getElementById('tab-seq'),page:document.getElementById('page-seq')}};
+
+/* ========= State ========= */
+let currentNoteIndex=null; // 0-12 index in OCARINA_RANGE (for Key tab)
+let currentSequenceIndex = null; // index in originalSequence (for Seq tab)
+
+/* ========= Audio ========= */
+function playNote(freq,dur=.45){
   if(!audioContext||!freq)return;
   if(audioContext.state==='suspended')audioContext.resume();
-  const osc=audioContext.createOscillator(),gain=audioContext.createGain();
+  const osc=audioContext.createOscillator();const gain=audioContext.createGain();
   osc.type='sine';osc.frequency.setValueAtTime(freq,audioContext.currentTime);
   gain.gain.setValueAtTime(.5,audioContext.currentTime);
   gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+dur);
@@ -173,125 +156,135 @@ function playNote(freq,dur=.5){
   osc.start();osc.stop(audioContext.currentTime+dur);
 }
 
+/* ========= UI helpers ========= */
+function setStaff(key){staffImg.src=key&&STAFF_IMG[key]?IMG_PATH+STAFF_IMG[key]:IMG_PATH+STAFF_BLANK;}
+function highlightKeys(note){document.querySelectorAll('.piano .white-key,.piano .black-key').forEach(k=>k.classList.toggle('active',k.dataset.note===note));}
 function createCard(note,label){
   const wrap=document.createElement('div');wrap.className='card';
   const lbl=document.createElement('div');lbl.className='note-label';lbl.textContent=label;
-  const img=document.createElement('img');
-  img.onerror=()=>{img.style.display='none';lbl.textContent+=' (画像なし)';lbl.style.color='#888';};
-  if(note && FINGERING_IMG[note]){
-    img.src=IMG_PATH+FINGERING_IMG[note];
-    img.alt=`${note} fingering`;
-    img.style.cursor='pointer';
-    if(NOTE_FREQUENCIES[note]){
-      img.addEventListener('click',()=>playNote(NOTE_FREQUENCIES[note]));
-    }
-  }else{
-    img.style.display='none';
-  }
-  wrap.appendChild(lbl);wrap.appendChild(img);
-  return wrap;
-}
+  const img=document.createElement('img');img.onerror=()=>{img.style.display='none';lbl.style.color='#888';lbl.textContent+=' (画像なし)';};
+  if(note&&FINGERING_IMG[note]){img.src=IMG_PATH+FINGERING_IMG[note];img.alt=`${note} fingering`;}else{img.style.display='none';}
+  wrap.appendChild(lbl);wrap.appendChild(img);return wrap;}
+function renderSingle(note){if(!(note in NOTE_FREQUENCIES))return;const staffKey=SHARP_TO_FLAT[note]||note;highlightKeys(note);setStaff(staffKey);boardKey.innerHTML='';const card=createCard(note,staffKey.replace(/b/,'♭').replace(/#/,'♯'));boardKey.appendChild(card);playNote(NOTE_FREQUENCIES[note]);currentNoteIndex=NOTE_TO_INDEX[note];}
+function moveNote(step){if(currentNoteIndex===null)return;let newIdx=currentNoteIndex+step;if(newIdx<0||newIdx>=OCARINA_RANGE.length)return;renderSingle(OCARINA_RANGE[newIdx]);}
 
-function setStaff(key){
-  document.getElementById('staff-img').src=key&&STAFF_IMG[key]?IMG_PATH+STAFF_IMG[key]:IMG_PATH+STAFF_BLANK;
-}
-
-/* ========= Piano build ========= */
-const pianoRoot=document.getElementById('piano');
-(function(){
-  const notes=["C","D","E","F","G","A","B","C2"];
-  const blackPos={"C#":0,"D#":1,"F#":3,"G#":4,"A#":5};
-  const whiteKeys=notes.map(n=>{
-    const k=document.createElement('div');k.className='white-key';k.dataset.note=n;
-    k.addEventListener('click',()=>renderSingle(n,n));pianoRoot.appendChild(k);return k;
-  });
-  Object.entries(blackPos).forEach(([n,i])=>{
-    const target=whiteKeys[i];if(!target)return;
-    const bk=document.createElement('div');bk.className='black-key';
-    bk.style.left=`${target.offsetLeft+36-13}px`;bk.dataset.note=n;
-    bk.addEventListener('click',e=>{e.stopPropagation();renderSingle(n,n);});
-    pianoRoot.appendChild(bk);
-  });
-})();
-
-/* ========= Rendering ========= */
-const boardKey=document.getElementById('board-key');
-function renderSingle(note,staffKey){
-  playNote(NOTE_FREQUENCIES[note]);setStaff(staffKey);
-  boardKey.innerHTML='';
-  boardKey.appendChild(createCard(note,staffKey.replace(/b/,'♭').replace(/#/,'♯')));
-  document.querySelectorAll('.piano .white-key,.piano .black-key')
-    .forEach(k=>k.classList.toggle('active',k.dataset.note===note));
-}
+/* ========= Piano Build ========= */
+(function buildPiano(){const whites=["C","D","E","F","G","A","B","C2"];const blackPos={"C#":0,"D#":1,"F#":3,"G#":4,"A#":5};const whiteEls=whites.map(n=>{const el=document.createElement('div');el.className='white-key';el.dataset.note=n;el.addEventListener('click',()=>renderSingle(n));pianoRoot.appendChild(el);return el;});Object.entries(blackPos).forEach(([n,i])=>{const target=whiteEls[i];if(!target)return;const bk=document.createElement('div');bk.className='black-key';bk.dataset.note=n;bk.style.left=`${target.offsetLeft+36-13}px`;bk.addEventListener('click',e=>{e.stopPropagation();renderSingle(n);});pianoRoot.appendChild(bk);});})();
 
 /* ========= Tabs ========= */
-const tabs={key:{btn:document.getElementById('tab-key'),page:document.getElementById('page-key')},
-            seq:{btn:document.getElementById('tab-seq'),page:document.getElementById('page-seq')}};
 Object.entries(tabs).forEach(([n,o])=>o.btn.addEventListener('click',()=>switchTab(n)));
-function switchTab(active){
-  Object.entries(tabs).forEach(([n,{btn,page}])=>{
-    const on=n===active;btn.classList.toggle('active',on);page.classList.toggle('active',on);
-  });
-  if(active==='key')setStaff(null);
-}
+function switchTab(active){Object.entries(tabs).forEach(([n,{btn,page}])=>{const on=n===active;btn.classList.toggle('active',on);page.classList.toggle('active',on);});currentSequenceIndex=null;currentNoteIndex=null;highlightKeys(null);if(active==='key')setStaff(null);}
 
-/* ========= Sequence parser ========= */
-const seqBtn=document.getElementById('seq-btn'),seqInput=document.getElementById('seq-input'),boardSeq=document.getElementById('board-seq');
-const transposeControls=document.getElementById('transpose-controls');
-const transposeLevel=document.getElementById('transpose-level');
-const transposeUpBtn=document.getElementById('transpose-up');
-const transposeDownBtn=document.getElementById('transpose-down');
+/* ========= Keyboard Navigation (for BOTH tabs) ========= */
+document.addEventListener('keydown',e=>{
+    const isLeft = e.key === 'ArrowLeft';
+    const isRight = e.key === 'ArrowRight';
+    if (!isLeft && !isRight) return;
 
-// 正規表現生成（ひらがな/カタカナ/ローマ字すべてを対象）
-const escapedKeys=Object.keys(INPUT_TO_NOTE).sort((a,b)=>b.length-a.length)
-  .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
-const comboRegex=new RegExp(`(${escapedKeys.join('|')})(?:（([^）]+)）)?`,'gi');
-
-function transposeNote(note,steps){
-  const idx=NOTE_TO_INDEX[note];if(idx===undefined)return null;
-  const newIdx=idx+steps;if(newIdx>=0&&newIdx<OCARINA_RANGE.length)return OCARINA_RANGE[newIdx];
-  return null;
-}
-function renderTransposedSequence(){
-  boardSeq.innerHTML='';
-  if(originalSequence.length===0){
-    transposeControls.style.display='none';setStaff(null);return;
-  }
-  transposeControls.style.display='flex';
-  transposeLevel.textContent=`Key: ${transposition>0?'+':''}${transposition}`;
-  let firstStaff=null;
-  originalSequence.forEach(item=>{
-    const transNote=transposeNote(item.note,transposition);
-    if(transNote){
-      let display=Object.keys(SHARP_TO_FLAT).find(k=>SHARP_TO_FLAT[k]===transNote)?.replace(/b/,'♭')||transNote.replace(/#/,'♯');
-      if(transNote==='C2')display='ド2';
-      const lbl=item.lyric?`${display}（${item.lyric}）`:display;
-      boardSeq.appendChild(createCard(transNote,lbl));
-      if(!firstStaff)firstStaff=SHARP_TO_FLAT[transNote]||transNote;
-    }else{
-      const lbl=item.lyric?`音域外（${item.lyric}）`:`音域外`;
-      boardSeq.appendChild(createCard(null,lbl));
+    if(tabs.key.page.classList.contains('active')) {
+        moveNote(isLeft ? -1 : 1);
     }
-  });
-  setStaff(firstStaff);
+    else if (tabs.seq.page.classList.contains('active')) {
+        if (currentSequenceIndex === null || originalSequence.length === 0) return;
+        const newIndex = currentSequenceIndex + (isLeft ? -1 : 1);
+        if (newIndex >= 0 && newIndex < originalSequence.length) {
+            selectSequenceNote(newIndex);
+        }
+    }
+});
+
+
+/* ========= Sequence Mode ========= */
+const seqInput=document.getElementById('seq-input');const seqBtn=document.getElementById('seq-btn');const boardSeq=document.getElementById('board-seq');const transposeControls=document.getElementById('transpose-controls');const transposeLevel=document.getElementById('transpose-level');const transposeUp=document.getElementById('transpose-up');const transposeDown=document.getElementById('transpose-down');
+const ESCAPED_KEYS=Object.keys(INPUT_TO_NOTE).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));const comboRegex=new RegExp(`(${ESCAPED_KEYS.join('|')})(?:（([^）]+)）)?`,'gi');
+let originalSequence=[];let transposition=0;
+
+function transposeNote(note,step){const idx=NOTE_TO_INDEX[note];if(idx===undefined)return null;const newIdx=idx+step;if(newIdx<0||newIdx>=OCARINA_RANGE.length)return null;return OCARINA_RANGE[newIdx];}
+
+function selectSequenceNote(index) {
+    if (index < 0 || index >= originalSequence.length) return;
+    currentSequenceIndex = index;
+    const cards = boardSeq.querySelectorAll('.card');
+    cards.forEach((card, i) => card.classList.toggle('active', i === index));
+    const item = originalSequence[index];
+    const tNote = transposeNote(item.note, transposition);
+    if (tNote) {
+        const staffKey = SHARP_TO_FLAT[tNote] || tNote;
+        setStaff(staffKey);
+        playNote(NOTE_FREQUENCIES[tNote]);
+    }
+}
+
+function renderTransposedSequence(){
+    boardSeq.innerHTML='';
+    if(originalSequence.length===0){
+        transposeControls.style.display='none';
+        setStaff(null);
+        return;
+    }
+    transposeControls.style.display='flex';
+    transposeLevel.textContent=`Key: ${transposition>0?'+':''}${transposition}`;
+    
+    originalSequence.forEach((item, index)=>{
+        const tNote=transposeNote(item.note,transposition);
+        let card;
+        if(tNote){
+            const disp=(SHARP_TO_FLAT[tNote] || tNote).replace(/b/,'♭').replace(/#/,'♯');
+            const lbl=item.lyric?`${disp}（${item.lyric}）`:disp;
+            card = createCard(tNote,lbl);
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', () => selectSequenceNote(index));
+        }else{
+            const lbl=item.lyric?`音域外（${item.lyric}）`:'音域外';
+            card = createCard(null,lbl);
+        }
+        boardSeq.appendChild(card);
+    });
+
+    if (currentSequenceIndex !== null && currentSequenceIndex < originalSequence.length) {
+        selectSequenceNote(currentSequenceIndex);
+    } else {
+        const firstValidIndex = originalSequence.findIndex(item => transposeNote(item.note, transposition) !== null);
+        if(firstValidIndex !== -1) {
+            selectSequenceNote(firstValidIndex);
+        } else {
+             setStaff(null);
+        }
+    }
 }
 
 seqBtn.addEventListener('click',()=>{
-  const raw=seqInput.value.trim();boardSeq.innerHTML='';
-  if(!raw){originalSequence=[];renderTransposedSequence();seqInput.focus();return;}
-  const matches=[...raw.matchAll(comboRegex)];
-  if(matches.length===0){
-    boardSeq.textContent='認識できる音名がありませんでした。';
-    originalSequence=[];renderTransposedSequence();setStaff(null);return;
-  }
-  originalSequence=matches.map(m=>{
-    const token=m[1];const lyric=m[2]||'';const note=INPUT_TO_NOTE[token];
-    return{note,lyric,token};
-  });
-  transposition=0;renderTransposedSequence();
+    const raw=seqInput.value.trim();
+    if(!raw){
+        originalSequence=[];
+        currentSequenceIndex = null;
+        renderTransposedSequence();
+        seqInput.focus();
+        return;
+    }
+    const matches=[...raw.matchAll(comboRegex)];
+    if(matches.length===0){
+        boardSeq.textContent='認識できる音名がありませんでした。';
+        originalSequence=[];
+        currentSequenceIndex = null;
+        renderTransposedSequence();
+        setStaff(null);
+        return;
+    }
+    originalSequence=matches.map(m=>{
+        const token = m[1].toUpperCase();
+        const noteName = token.replace('♭','b').replace('♯','#');
+        const lyric=m[2]||'';
+        const note=INPUT_TO_NOTE[noteName] || INPUT_TO_NOTE[m[1]]; // Try uppercase English first, then original
+        return{note,lyric};
+    });
+    transposition=0;
+    currentSequenceIndex = null;
+    renderTransposedSequence();
 });
-transposeUpBtn.addEventListener('click',()=>{transposition++;renderTransposedSequence();});
-transposeDownBtn.addEventListener('click',()=>{transposition--;renderTransposedSequence();});
+
+transposeUp.addEventListener('click',()=>{transposition++;renderTransposedSequence();});
+transposeDown.addEventListener('click',()=>{transposition--;renderTransposedSequence();});
 seqInput.addEventListener('keydown',e=>{if(e.key==='Enter')seqBtn.click();});
 </script>
 </body>
