@@ -183,21 +183,33 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center; /* 中央揃え */
     gap: 0.5rem;
     padding: 1rem;
     background: var(--surface-color);
     border-radius: var(--radius);
     box-shadow: var(--shadow-light);
     width: 100%;
+    min-height: 150px; /* 高さを揃える */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .card:hover {
+  /* 休符カードのスタイル */
+  .card.rest-card {
+    box-shadow: none;
+    background: transparent;
+    cursor: default !important;
+  }
+  .card:not(.rest-card):hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow);
   }
   .card.active {
     box-shadow: 0 0 0 3px var(--primary-color);
     transform: translateY(-2px);
+  }
+  .card.rest-card.active {
+      background: var(--primary-light);
+      box-shadow: none;
   }
   .card img {
     width: 100px;
@@ -321,9 +333,9 @@
     </section>
 
     <section id="page-seq">
-      <p>「ドレミ」や「C D E」のように音名を入力して、運指を一覧で表示します。</p>
+      <p>「ドレミ」や「C D E」のように音名を入力して、運指を一覧で表示します。スペースで休符も入力できます。</p>
       <div class="seq-wrapper">
-        <input id="seq-input" placeholder="例: み♭ ふぁ そ♭" />
+        <input id="seq-input" placeholder="例: ド レ ミ (スペースで休符)" />
         <button id="seq-btn" class="btn">運指を表示</button>
       </div>
       <div id="transpose-controls" class="transpose-controls">
@@ -354,7 +366,7 @@ const INPUT_TO_NOTE={
   // カタカナ
   "ド":"C","レ":"D","ミ":"E","ファ":"F","ソ":"G","ラ":"A","シ":"B","ド2":"C2",
   "ド#":"C#","ド♯":"C#","レ#":"D#","レ♯":"D#","ファ#":"F#","ファ♯":"F#","ソ#":"G#","ソ♯":"G#","ラ#":"A#","ラ♯":"A#",
-  "レb":"C#","レ♭":"C#","ミb":"D#","ミ♭":"D#","ソb":"F#","そ♭":"F#","ラb":"G#","ラ♭":"G#","シb":"A#","シ♭":"A#",
+  "レb":"C#","レ♭":"C#","ミb":"D#","ミ♭":"D#","ソb":"F#","ソ♭":"F#","ラb":"G#","ラ♭":"G#","シb":"A#","シ♭":"A#",
   // ローマ字・英字
   C:"C",B:"B","C#":"C#","DB":"C#","D":"D","D#":"D#","EB":"D#","E":"E","F":"F","F#":"F#","GB":"F#",G:"G","G#":"G#","AB":"G#",A:"A","A#":"A#","BB":"A#",C2:"C2"
 };
@@ -394,6 +406,14 @@ function highlightKeys(note){document.querySelectorAll('.piano .white-key,.piano
 function createCard(note,label){
   const wrap=document.createElement('div');wrap.className='card';
   const lbl=document.createElement('div');lbl.className='note-label';lbl.textContent=label;
+
+  if (note === 'REST') {
+    wrap.classList.add('rest-card');
+    lbl.style.color = 'var(--text-light-color)';
+    wrap.appendChild(lbl);
+    return wrap;
+  }
+  
   const img=document.createElement('img');img.onerror=()=>{img.style.display='none';lbl.style.color='#888';lbl.textContent+=' (画像なし)';};
   if(note&&FINGERING_IMG[note]){img.src=IMG_PATH+FINGERING_IMG[note];img.alt=`${note} fingering`;}else{img.style.display='none';}
   wrap.appendChild(lbl);wrap.appendChild(img);return wrap;}
@@ -412,6 +432,7 @@ document.addEventListener('keydown',e=>{
     const isLeft = e.key === 'ArrowLeft';
     const isRight = e.key === 'ArrowRight';
     if (!isLeft && !isRight) return;
+    e.preventDefault(); // 矢印キーでのスクロールを防止
     if(tabs.key.page.classList.contains('active')) {
         moveNote(isLeft ? -1 : 1);
     }
@@ -426,24 +447,37 @@ document.addEventListener('keydown',e=>{
 
 /* ========= Sequence Mode ========= */
 const seqInput=document.getElementById('seq-input');const seqBtn=document.getElementById('seq-btn');const boardSeq=document.getElementById('board-seq');const transposeControls=document.getElementById('transpose-controls');const transposeLevel=document.getElementById('transpose-level');const transposeUp=document.getElementById('transpose-up');const transposeDown=document.getElementById('transpose-down');
-const ESCAPED_KEYS=Object.keys(INPUT_TO_NOTE).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));const comboRegex=new RegExp(`(${ESCAPED_KEYS.join('|')})(?:（([^）]+)）)?`,'gi');
+
+const ESCAPED_KEYS=Object.keys(INPUT_TO_NOTE).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
 let originalSequence=[];let transposition=0;
-function transposeNote(note,step){const idx=NOTE_TO_INDEX[note];if(idx===undefined)return null;const newIdx=idx+step;if(newIdx<0||newIdx>=OCARINA_RANGE.length)return null;return OCARINA_RANGE[newIdx];}
+function transposeNote(note,step){if(note==='REST')return 'REST'; const idx=NOTE_TO_INDEX[note];if(idx===undefined)return null;const newIdx=idx+step;if(newIdx<0||newIdx>=OCARINA_RANGE.length)return null;return OCARINA_RANGE[newIdx];}
 function selectSequenceNote(index) {
     if (index < 0 || index >= originalSequence.length) return;
     currentSequenceIndex = index;
     const cards = boardSeq.querySelectorAll('.card');
     cards.forEach((card, i) => card.classList.toggle('active', i === index));
     const item = originalSequence[index];
+    
+    if (item.note === 'REST') {
+        setStaff(null);
+        highlightKeys(null);
+        return;
+    }
+
     const tNote = transposeNote(item.note, transposition);
     if (tNote) {
         const staffKey = SHARP_TO_FLAT[tNote] || tNote;
         setStaff(staffKey);
         playNote(NOTE_FREQUENCIES[tNote]);
+        highlightKeys(tNote);
+    } else {
+        setStaff(null);
+        highlightKeys(null);
     }
 }
 function renderTransposedSequence(){
     boardSeq.innerHTML='';
+    highlightKeys(null);
     if(originalSequence.length===0){
         transposeControls.style.display='none';
         setStaff(null);
@@ -452,24 +486,28 @@ function renderTransposedSequence(){
     transposeControls.style.display='flex';
     transposeLevel.textContent=`Key: ${transposition>0?'+':''}${transposition}`;
     originalSequence.forEach((item, index)=>{
-        const tNote=transposeNote(item.note,transposition);
         let card;
-        if(tNote){
-            const disp=(SHARP_TO_FLAT[tNote] || tNote).replace(/b/,'♭').replace(/#/,'♯');
-            const lbl=item.lyric?`${disp}（${item.lyric}）`:disp;
-            card = createCard(tNote,lbl);
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', () => selectSequenceNote(index));
-        }else{
-            const lbl=item.lyric?`音域外（${item.lyric}）`:'音域外';
-            card = createCard(null,lbl);
+        if (item.note === 'REST') {
+            card = createCard('REST', ' ');
+        } else {
+            const tNote=transposeNote(item.note,transposition);
+            if(tNote){
+                const disp=(SHARP_TO_FLAT[tNote] || tNote).replace(/b/,'♭').replace(/#/,'♯');
+                const lbl=item.lyric?`${disp}（${item.lyric}）`:disp;
+                card = createCard(tNote,lbl);
+            }else{
+                const lbl=item.lyric?`音域外（${item.lyric}）`:'音域外';
+                card = createCard(null,lbl);
+            }
         }
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => selectSequenceNote(index));
         boardSeq.appendChild(card);
     });
     if (currentSequenceIndex !== null && currentSequenceIndex < originalSequence.length) {
         selectSequenceNote(currentSequenceIndex);
     } else {
-        const firstValidIndex = originalSequence.findIndex(item => transposeNote(item.note, transposition) !== null);
+        const firstValidIndex = originalSequence.findIndex(item => transposeNote(item.note, transposition) !== null && item.note !== 'REST');
         if(firstValidIndex !== -1) {
             selectSequenceNote(firstValidIndex);
         } else {
@@ -478,24 +516,36 @@ function renderTransposedSequence(){
     }
 }
 seqBtn.addEventListener('click',()=>{
-    const raw=seqInput.value.trim();
-    if(!raw){
+    const raw=seqInput.value;
+    if(!raw.trim()){
         originalSequence=[]; currentSequenceIndex = null;
         renderTransposedSequence(); seqInput.focus(); return;
     }
-    const matches=[...raw.matchAll(comboRegex)];
+
+    // 音名トークン、歌詞、またはスペースにマッチする正規表現
+    const tokenRegex = new RegExp(`(${ESCAPED_KEYS.join('|')})(?:（([^）]+)）)?|([ 　]+)`, 'gi');
+    const matches=[...raw.matchAll(tokenRegex)];
+
     if(matches.length===0){
         boardSeq.innerHTML='<p style="grid-column: 1 / -1; color: var(--text-light-color);">認識できる音名がありませんでした。</p>';
         originalSequence=[]; currentSequenceIndex = null;
         renderTransposedSequence(); setStaff(null); return;
     }
     originalSequence=matches.map(m=>{
-        const token = m[1].toUpperCase();
-        const noteName = token.replace('♭','b').replace('♯','#');
-        const lyric=m[2]||'';
-        const note=INPUT_TO_NOTE[noteName] || INPUT_TO_NOTE[m[1]];
-        return{note,lyric};
-    });
+        const noteToken = m[1];
+        const lyricToken = m[2];
+        const spaceToken = m[3];
+        if (spaceToken) {
+            return { note: 'REST', lyric: '' };
+        } else if (noteToken) {
+            const token = noteToken.toUpperCase();
+            const noteName = token.replace('♭','b').replace('♯','#');
+            const lyric=lyricToken||'';
+            const note=INPUT_TO_NOTE[noteName] || INPUT_TO_NOTE[m[1]];
+            return{note,lyric};
+        }
+        return null;
+    }).filter(Boolean); // nullを除去
     transposition=0;
     currentSequenceIndex = null;
     renderTransposedSequence();
