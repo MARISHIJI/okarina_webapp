@@ -88,7 +88,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 180px;
+    height: 180px;
     margin: 0 auto 1.5rem auto;
     background: var(--surface-color);
     border-radius: var(--radius);
@@ -166,7 +166,8 @@
   /* --- 運指表示ボード --- */
   .board {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    /* ★★★ ここを変更しました ★★★ */
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     justify-items: center;
     margin-top: 2rem;
@@ -189,7 +190,7 @@
     transform: translateY(-4px);
     box-shadow: 0 0 0 2px var(--primary-color), var(--shadow);
   }
-  .card img { width: 100px; height: auto; }
+  .card img { width: 80%; height: auto; }
   .note-label { font-weight: 500; font-size: 1rem; }
 
   /* --- レスポンシブ --- */
@@ -198,7 +199,7 @@
     header h1 { font-size: 1.3rem; }
     .piano-staff { padding: 1.5rem; }
     .board { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-    .card img { width: 80px; }
+    .card img { width: 80%; }
   }
   @media(max-width: 480px) {
     .board { grid-template-columns: repeat(2, 1fr); }

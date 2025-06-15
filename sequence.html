@@ -92,28 +92,28 @@
     opacity: 0;
     padding-top: 0;
     padding-bottom: 0;
-    transition: max-height 0.5s ease-out, opacity 0.4s ease-out, padding 0.5s ease-out, margin 0.5s ease-out;
+    transition: max-height 0s ease-out, opacity 0.4s ease-out, padding 0.5s ease-out, margin 0.5s ease-out;
   }
+  /* ▼▼▼ 変更箇所 ▼▼▼ */
   .keyboard-section.visible {
     max-height: 600px;
     opacity: 1;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-  }
-  .piano-wrapper {
+    padding: 1rem;
     display: flex;
     gap: 2rem;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    padding: 0 2rem;
   }
+
+  /* ▲▲▲ 変更箇所 ▲▲▲ */
+
   #key-fingering-display {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 180px;
-    width: 200px;
+    min-height: 160px;
+    width: 160px;
     background: var(--background-color);
     border-radius: var(--radius);
     padding: 1rem;
@@ -163,7 +163,6 @@
   /* --- 運指表示ボード --- */
   .board {
     display: grid;
-    /* ▼▼▼ 変更箇所: 4列に固定 ▼▼▼ */
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     justify-items: center;
@@ -280,14 +279,11 @@
     </div>
     
     <div id="keyboard-section" class="keyboard-section">
-      <div class="piano-wrapper">
         <div id="key-fingering-display">
           <span>キーを押してください</span>
         </div>
         <div id="piano" class="piano"></div>
-      </div>
     </div>
-
     <div id="transpose-controls" class="transpose-controls">
       <button id="transpose-down" class="btn">- Key</button>
       <span id="transpose-level">Key: 0</span>
