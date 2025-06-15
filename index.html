@@ -43,6 +43,7 @@
   .board{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem;justify-items:center;margin-top:1.5rem;}
   .card{display:flex;flex-direction:column;align-items:center;gap:.4rem;}
   .card img{width:120px;height:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15));}
+
   .note-label{font-weight:600;}
 
   /* ---------- Inputs ---------- */
@@ -50,11 +51,23 @@
   #seq-input{width:100%;padding:.6rem;border:1px solid #aaa;border-radius:6px;font-size:1rem;}
   .btn{margin-top:.8rem;padding:.6rem 1.2rem;border:none;border-radius:6px;background:var(--primary);color:#fff;font-weight:600;cursor:pointer;}
 
+  /* Begen: 変更・追加 */
+  .transpose-controls{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    gap:1rem;
+    margin-top:1.5rem;
+    text-align:center;
+  }
+  .transpose-controls .btn{margin-top:0;}
+  #transpose-level{font-size:1.1rem;font-weight:600;width:80px;display:inline-block;}
+  /* End: 変更・追加 */
+
   /* ---------- Responsive ---------- */
   @media(max-width:768px){.card img{width:100px;}}
   @media(max-width:600px){
-    .board{grid-template-columns:repeat(3,1fr);}
-    main{padding:0 1rem 1rem;}header{padding:1rem;}header h1{font-size:1.2rem;}
+    .board{grid-template-columns:repeat(3,1fr);}main{padding:0 1rem 1rem;}header{padding:1rem;}header h1{font-size:1.2rem;}
     .card img{width:80px;}
   }
 </style>
@@ -80,10 +93,16 @@
   </section>
 
   <section id="page-seq">
-    <p>「ミ♭」「Eb」「ミb」などフラット表記も入力できます。</p>
+    <p>「ミ♭」「Eb」「ミb」などフラット表記も入力できます。ひらがな（例:「れ」「ふぁ」）にも対応。</p>
     <div class="seq-wrapper">
-      <input id="seq-input" placeholder="例: ミ♭（き）ファ（み）ソ♭（ー）" />
+      <input id="seq-input" placeholder="例: み♭（き） ふぁ（み） そ♭（ー）" />
       <button id="seq-btn" class="btn">変換</button>
+    </div>
+    
+    <div id="transpose-controls" class="transpose-controls">
+      <button id="transpose-down" class="btn">- Key</button>
+      <span id="transpose-level">Key: 0</span>
+      <button id="transpose-up" class="btn">+ Key</button>
     </div>
     <div id="board-seq" class="board"></div>
   </section>
@@ -98,17 +117,23 @@ try{audioContext=new(window.AudioContext||window.webkitAudioContext)();}catch(e)
 const NOTE_FREQUENCIES={C:261.63,"C#":277.18,D:293.66,"D#":311.13,E:329.63,F:349.23,"F#":369.99,
 G:392.00,"G#":415.30,A:440.00,"A#":466.16,B:493.88,C2:523.25};
 
-/* 入力文字列 → 内部ノート名 */
+/* 入力文字列 → 内部ノート名  ひらがなサポート付き */
 const INPUT_TO_NOTE={
-  // naturals
+  // ひらがな
+  "ど":"C","れ":"D","み":"E","ふぁ":"F","そ":"G","ら":"A","し":"B","ど2":"C2",
+  "ど#":"C#","ど♯":"C#","れ#":"D#","れ♯":"D#","ふぁ#":"F#","ふぁ♯":"F#",
+  "そ#":"G#","そ♯":"G#","ら#":"A#","ら♯":"A#",
+  "れb":"C#","れ♭":"C#","みb":"D#","み♭":"D#","そb":"F#","そ♭":"F#",
+  "らb":"G#","ら♭":"G#","しb":"A#","し♭":"A#",
+
+  // カタカナ
   "ド":"C","レ":"D","ミ":"E","ファ":"F","ソ":"G","ラ":"A","シ":"B","ド2":"C2",
-  // sharps（日本語）
   "ド#":"C#","ド♯":"C#","レ#":"D#","レ♯":"D#","ファ#":"F#","ファ♯":"F#",
   "ソ#":"G#","ソ♯":"G#","ラ#":"A#","ラ♯":"A#",
-  // flats（日本語）→ enharmonic sharps
   "レb":"C#","レ♭":"C#","ミb":"D#","ミ♭":"D#","ソb":"F#","ソ♭":"F#",
   "ラb":"G#","ラ♭":"G#","シb":"A#","シ♭":"A#",
-  // A-Z 表記
+
+  // ローマ字 & アルファベット
   C:"C",B:"B","C#":"C#","DB":"C#","D":"D","D#":"D#","EB":"D#","E":"E","F":"F","F#":"F#","GB":"F#",
   G:"G","G#":"G#","AB":"G#","A":"A","A#":"A#","BB":"A#","C2":"C2"
 };
@@ -121,19 +146,20 @@ const FINGERING_IMG={
   "G#":'fingering_Gs.png',A:'fingering_A.png',"A#":'fingering_As.png',B:'fingering_B.png',C2:'fingering_C2.png'
 };
 
-/* 五線譜画像（♯／♭ も両対応） */
+/* 五線譜画像 */
 const STAFF_IMG={
-  // natural
   C:'staff_C.png',D:'staff_D.png',E:'staff_E.png',F:'staff_F.png',G:'staff_G.png',A:'staff_A.png',B:'staff_B.png',C2:'staff_C2.png',
-  // sharps
   "C#":'staff_Cs.png',"D#":'staff_Ds.png',"F#":'staff_Fs.png',"G#":'staff_Gs.png',"A#":'staff_As.png',
-  // flats
   Db:'staff_Db.png',Eb:'staff_Eb.png',Gb:'staff_Gb.png',Ab:'staff_Ab.png',Bb:'staff_Bb.png'
 };
 const STAFF_BLANK='staff_blank.png';
-
-/* シャープ→フラット表示変換用 */
 const SHARP_TO_FLAT={"C#":"Db","D#":"Eb","F#":"Gb","G#":"Ab","A#":"Bb"};
+
+/* ========= Transposition Data ========= */
+const OCARINA_RANGE=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B","C2"];
+const NOTE_TO_INDEX=Object.fromEntries(OCARINA_RANGE.map((n,i)=>[n,i]));
+
+let originalSequence=[];let transposition=0;
 
 /* ========= Helpers ========= */
 function playNote(freq,dur=.5){
@@ -146,17 +172,28 @@ function playNote(freq,dur=.5){
   osc.connect(gain);gain.connect(audioContext.destination);
   osc.start();osc.stop(audioContext.currentTime+dur);
 }
+
 function createCard(note,label){
   const wrap=document.createElement('div');wrap.className='card';
   const lbl=document.createElement('div');lbl.className='note-label';lbl.textContent=label;
   const img=document.createElement('img');
   img.onerror=()=>{img.style.display='none';lbl.textContent+=' (画像なし)';lbl.style.color='#888';};
-  img.src=IMG_PATH+FINGERING_IMG[note];img.alt=`${note} fingering`;
+  if(note && FINGERING_IMG[note]){
+    img.src=IMG_PATH+FINGERING_IMG[note];
+    img.alt=`${note} fingering`;
+    img.style.cursor='pointer';
+    if(NOTE_FREQUENCIES[note]){
+      img.addEventListener('click',()=>playNote(NOTE_FREQUENCIES[note]));
+    }
+  }else{
+    img.style.display='none';
+  }
   wrap.appendChild(lbl);wrap.appendChild(img);
   return wrap;
 }
+
 function setStaff(key){
-  document.getElementById('staff-img').src = key && STAFF_IMG[key] ? IMG_PATH+STAFF_IMG[key] : IMG_PATH+STAFF_BLANK;
+  document.getElementById('staff-img').src=key&&STAFF_IMG[key]?IMG_PATH+STAFF_IMG[key]:IMG_PATH+STAFF_BLANK;
 }
 
 /* ========= Piano build ========= */
@@ -179,11 +216,10 @@ const pianoRoot=document.getElementById('piano');
 
 /* ========= Rendering ========= */
 const boardKey=document.getElementById('board-key');
-function renderSingle(note, staffKey){
-  playNote(NOTE_FREQUENCIES[note]); setStaff(staffKey);
-
+function renderSingle(note,staffKey){
+  playNote(NOTE_FREQUENCIES[note]);setStaff(staffKey);
   boardKey.innerHTML='';
-  boardKey.appendChild(createCard(note, staffKey.replace(/b/,'♭').replace(/#/,'♯')));
+  boardKey.appendChild(createCard(note,staffKey.replace(/b/,'♭').replace(/#/,'♯')));
   document.querySelectorAll('.piano .white-key,.piano .black-key')
     .forEach(k=>k.classList.toggle('active',k.dataset.note===note));
 }
@@ -201,35 +237,61 @@ function switchTab(active){
 
 /* ========= Sequence parser ========= */
 const seqBtn=document.getElementById('seq-btn'),seqInput=document.getElementById('seq-input'),boardSeq=document.getElementById('board-seq');
+const transposeControls=document.getElementById('transpose-controls');
+const transposeLevel=document.getElementById('transpose-level');
+const transposeUpBtn=document.getElementById('transpose-up');
+const transposeDownBtn=document.getElementById('transpose-down');
 
-/* 取りうるトークンを長い順でエスケープ → 正規表現 */
+// 正規表現生成（ひらがな/カタカナ/ローマ字すべてを対象）
 const escapedKeys=Object.keys(INPUT_TO_NOTE).sort((a,b)=>b.length-a.length)
   .map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
 const comboRegex=new RegExp(`(${escapedKeys.join('|')})(?:（([^）]+)）)?`,'gi');
 
-seqBtn.addEventListener('click',()=>{
-  const raw=seqInput.value.trim();boardSeq.innerHTML='';
-  if(!raw){seqInput.focus();return;}
-
-  const matches=[...raw.matchAll(comboRegex)];
-  if(matches.length===0){boardSeq.textContent='認識できる音名がありませんでした。';setStaff(null);return;}
-
+function transposeNote(note,steps){
+  const idx=NOTE_TO_INDEX[note];if(idx===undefined)return null;
+  const newIdx=idx+steps;if(newIdx>=0&&newIdx<OCARINA_RANGE.length)return OCARINA_RANGE[newIdx];
+  return null;
+}
+function renderTransposedSequence(){
+  boardSeq.innerHTML='';
+  if(originalSequence.length===0){
+    transposeControls.style.display='none';setStaff(null);return;
+  }
+  transposeControls.style.display='flex';
+  transposeLevel.textContent=`Key: ${transposition>0?'+':''}${transposition}`;
   let firstStaff=null;
-  matches.forEach(m=>{
-    const token=m[1],lyric=m[2]||'';
-    const note=INPUT_TO_NOTE[token];
-    if(!note||!FINGERING_IMG[note]){
-      boardSeq.appendChild(createCard('?',`「${token}」?`)); return;
+  originalSequence.forEach(item=>{
+    const transNote=transposeNote(item.note,transposition);
+    if(transNote){
+      let display=Object.keys(SHARP_TO_FLAT).find(k=>SHARP_TO_FLAT[k]===transNote)?.replace(/b/,'♭')||transNote.replace(/#/,'♯');
+      if(transNote==='C2')display='ド2';
+      const lbl=item.lyric?`${display}（${item.lyric}）`:display;
+      boardSeq.appendChild(createCard(transNote,lbl));
+      if(!firstStaff)firstStaff=SHARP_TO_FLAT[transNote]||transNote;
+    }else{
+      const lbl=item.lyric?`音域外（${item.lyric}）`:`音域外`;
+      boardSeq.appendChild(createCard(null,lbl));
     }
-
-    /* staff 用フラット変換 */
-    const staffKey = /[b♭]$/.test(token) ? SHARP_TO_FLAT[note] : note;
-    const labelText = lyric ? `${token}（${lyric}）` : token;
-    boardSeq.appendChild(createCard(note,labelText));
-    if(!firstStaff)firstStaff=staffKey;
   });
   setStaff(firstStaff);
+}
+
+seqBtn.addEventListener('click',()=>{
+  const raw=seqInput.value.trim();boardSeq.innerHTML='';
+  if(!raw){originalSequence=[];renderTransposedSequence();seqInput.focus();return;}
+  const matches=[...raw.matchAll(comboRegex)];
+  if(matches.length===0){
+    boardSeq.textContent='認識できる音名がありませんでした。';
+    originalSequence=[];renderTransposedSequence();setStaff(null);return;
+  }
+  originalSequence=matches.map(m=>{
+    const token=m[1];const lyric=m[2]||'';const note=INPUT_TO_NOTE[token];
+    return{note,lyric,token};
+  });
+  transposition=0;renderTransposedSequence();
 });
+transposeUpBtn.addEventListener('click',()=>{transposition++;renderTransposedSequence();});
+transposeDownBtn.addEventListener('click',()=>{transposition--;renderTransposedSequence();});
 seqInput.addEventListener('keydown',e=>{if(e.key==='Enter')seqBtn.click();});
 </script>
 </body>
