@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>サンプル曲 - Ocarina Fingering Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* --- デザインシステム --- */
+  :root {
+    --primary-color: #4a80e2; /* 上品な青 */
+    --primary-light: #eaf2ff; /* 明るい青 */
+    --background-color: #f7f9fc; /* 背景色 */
+    --surface-color: #ffffff; /* カードなどの背景色 */
+    --text-color: #333333; /* 基本の文字色 */
+    --text-light-color: #777777; /* 淡い文字色 */
+    --border-color: #e0e6f0; /* 境界線 */
+    --radius: 12px; /* 角丸の半径 */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 影 */
+    --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  /* --- 基本設定 --- */
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Noto Sans JP", system-ui, sans-serif;
+    margin: 0;
+    background: var(--background-color);
+    color: var(--text-color);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+  }
+
+  /* --- ヘッダー & ナビゲーション --- */
+  header {
+    background: var(--surface-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    letter-spacing: 0.05em;
+  }
+  .main-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  .main-nav a {
+    text-decoration: none;
+    color: var(--text-light-color);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .main-nav a:hover {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+  }
+  .main-nav a.current {
+    color: #fff;
+    background-color: var(--primary-color);
+    font-weight: 700;
+  }
+
+  main { flex: 1; }
+  main > p {
+    color: var(--text-light-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  /* --- ボタン --- */
+  .btn {
+    margin-top: 1rem;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--primary-color);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    display: inline-block; /* aタグをボタン風にするため */
+    text-decoration: none;
+  }
+  .btn:hover { background-color: #3a70c2; transform: translateY(-2px); }
+
+  /* --- サンプル曲リスト --- */
+  .sample-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+    margin: 2rem auto;
+  }
+  .song-item {
+    background: var(--surface-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-light);
+    transition: box-shadow 0.2s ease;
+    padding: 0;
+  }
+  .song-item[open] {
+    box-shadow: var(--shadow);
+  }
+  .song-item summary {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1.1rem;
+    outline: none;
+  }
+  .song-details-content {
+    padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+  }
+  .song-details-content pre {
+    white-space: pre-wrap;
+    background: var(--background-color);
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    text-align: left;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .song-details-content .btn {
+    margin-top: 1rem;
+  }
+
+  /* --- レスポンシブ --- */
+  @media(max-width: 768px) {
+    .container { padding: 1rem; }
+    header h1 { font-size: 1.3rem; }
+    .song-item summary {
+       padding: 1.5rem;
+    }
+   .song-details-content {
+        padding: 0.5rem 1rem 1.5rem 1rem;
+   }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>Ocarina Fingering Trainer</h1>
+    <nav class="main-nav">
+      <a href="keyboard.html">鍵盤で探す</a>
+      <a href="sequence.html">音名で入力</a>
+      <a href="samples.html" class="current">サンプル曲</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <main>
+    <p>練習したい曲を選んで「開く」と楽譜が表示されます。</p>
+    <div id="sample-song-list" class="sample-list">
+      </div>
+  </main>
+</div>
+
+<script>
+/* ========= サンプル曲データ ========= */
+const SAMPLE_SONGS = [
+   { title: 'きらきら星', sequence: 'ドドソソララソ\nファファミミレレド' },
+   { title: 'チューリップ', sequence: 'ドレミドレミ\nソミレドレミレド' },
+   { title: 'メリーさんのひつじ', sequence: 'ミレドレミミミ\nレレレミソソ\nミレドレミミミ\nミレレミレド' }
+];
+
+/* ========= サンプル曲リストの生成 ========= */
+(function buildSampleSongList() {
+   const listContainer = document.getElementById('sample-song-list');
+   if (!listContainer) return;
+   listContainer.innerHTML = '';
+
+   SAMPLE_SONGS.forEach(song => {
+       const details = document.createElement('details');
+       details.className = 'song-item';
+
+       const summary = document.createElement('summary');
+       summary.className = 'song-item-title';
+       summary.textContent = song.title;
+
+       const content = document.createElement('div');
+       content.className = 'song-details-content';
+
+       const pre = document.createElement('pre');
+       pre.textContent = song.sequence;
+
+       const loadLink = document.createElement('a');
+       loadLink.className = 'btn';
+       loadLink.textContent = 'この曲の運指を表示';
+       // sequence.htmlへURLパラメータで曲データを渡す
+       loadLink.href = `sequence.html?sequence=${encodeURIComponent(song.sequence)}`;
+
+       content.appendChild(pre);
+       content.appendChild(loadLink);
+       details.appendChild(summary);
+       details.appendChild(content);
+       listContainer.appendChild(details);
+   });
+})();
+</script>
+</body>
+</html>

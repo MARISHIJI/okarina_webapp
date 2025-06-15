@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>鍵盤で探す - Ocarina Fingering Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* --- デザインシステム --- */
+  :root {
+    --primary-color: #4a80e2; /* 上品な青 */
+    --primary-light: #eaf2ff; /* 明るい青 */
+    --background-color: #f7f9fc; /* 背景色 */
+    --surface-color: #ffffff; /* カードなどの背景色 */
+    --text-color: #333333; /* 基本の文字色 */
+    --text-light-color: #777777; /* 淡い文字色 */
+    --border-color: #e0e6f0; /* 境界線 */
+    --radius: 12px; /* 角丸の半径 */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 影 */
+    --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  /* --- 基本設定 --- */
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Noto Sans JP", system-ui, sans-serif;
+    margin: 0;
+    background: var(--background-color);
+    color: var(--text-color);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+  }
+
+  /* --- ヘッダー & ナビゲーション --- */
+  header {
+    background: var(--surface-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    letter-spacing: 0.05em;
+  }
+  .main-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  .main-nav a {
+    text-decoration: none;
+    color: var(--text-light-color);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .main-nav a:hover {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+  }
+  .main-nav a.current {
+    color: #fff;
+    background-color: var(--primary-color);
+    font-weight: 700;
+  }
+
+  main { flex: 1; }
+  main > p {
+    color: var(--text-light-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  /* --- 鍵盤用 運指表示エリア --- */
+  #key-fingering-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 180px;
+    margin: 0 auto 1.5rem auto;
+    background: var(--surface-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-light);
+    padding: 1rem;
+    max-width: 250px;
+  }
+  #key-fingering-display .card {
+    box-shadow: none;
+    padding: 0;
+  }
+  #key-fingering-display span {
+    color: var(--text-light-color);
+  }
+
+  /* --- ピアノ + 五線譜 --- */
+  .piano-staff {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: var(--surface-color);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-light);
+  }
+  .piano { position: relative; user-select: none; width: max-content; height: 160px; }
+  .white-key, .black-key {
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .white-key {
+    width: 36px;
+    height: 160px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    position: relative;
+    float: left;
+  }
+  .white-key.active {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+  }
+  .black-key {
+    position: absolute;
+    width: 24px;
+    height: 100px;
+    background: #333;
+    z-index: 1;
+  }
+  .black-key.active { background: var(--primary-color); }
+  .key-label {
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-light-color);
+    pointer-events: none;
+  }
+  .staff-img {
+    width: 240px;
+    height: 160px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+  }
+
+  /* --- 運指表示ボード --- */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1.5rem;
+    justify-items: center;
+    margin-top: 2rem;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--surface-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-light);
+    width: 100%;
+    min-height: 150px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 2px var(--primary-color), var(--shadow);
+  }
+  .card img { width: 100px; height: auto; }
+  .note-label { font-weight: 500; font-size: 1rem; }
+
+  /* --- レスポンシブ --- */
+  @media(max-width: 768px) {
+    .container { padding: 1rem; }
+    header h1 { font-size: 1.3rem; }
+    .piano-staff { padding: 1.5rem; }
+    .board { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .card img { width: 80px; }
+  }
+  @media(max-width: 480px) {
+    .board { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>Ocarina Fingering Trainer</h1>
+    <nav class="main-nav">
+      <a href="keyboard.html" class="current">鍵盤で探す</a>
+      <a href="sequence.html">音名で入力</a>
+      <a href="samples.html">サンプル曲</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <main>
+    <p>ピアノの鍵盤をクリックすると、その下に運指が表示されます。</p>
+    <div id="key-fingering-display">
+      <span>鍵盤を選択してください</span>
+    </div>
+    <div class="piano-staff">
+      <div id="piano" class="piano"></div>
+      <img id="staff-img" class="staff-img" src="./img/staff_blank.png" alt="五線譜">
+    </div>
+
+    <div style="margin-top: 3rem; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+      <h2 style="text-align: center; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: 0.05em;">運指・五線譜 一覧</h2>
+      <div id="fingering-chart-board" class="board"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ========= Web Audio ========= */
+let audioContext;
+try { audioContext = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { console.error('Web Audio API unsupported'); }
+
+/* ========= Alto C オカリナ音域 & データ ========= */
+const OCARINA_RANGE = ['A','A#','B','C','C#','D','D#','E','F','F#','G','G#','A2','A#2','B2','C2','C#2','D2','D#2','E2','F2'];
+const NOTE_FREQUENCIES = {'A':440,'A#':466.16,'B':493.88,'C':523.25,'C#':554.37,'D':587.33,'D#':622.25,'E':659.25,'F':698.46,'F#':739.99,'G':783.99,'G#':830.61,'A2':880,'A#2':932.33,'B2':987.77,'C2':1046.5,'C#2':1108.73,'D2':1174.66,'D#2':1244.51,'E2':1318.51,'F2':1396.91};
+const NOTE_TO_INDEX = Object.fromEntries(OCARINA_RANGE.map((n,i) => [n,i]));
+const IMG_PATH = './img/';
+const FINGERING_IMG = {'A':'fingering_A.png','A#':'fingering_As.png','B':'fingering_B.png','C':'fingering_C.png','C#':'fingering_Cs.png','D':'fingering_D.png','D#':'fingering_Ds.png','E':'fingering_E.png','F':'fingering_F.png','F#':'fingering_Fs.png','G':'fingering_G.png','G#':'fingering_Gs.png','A2':'fingering_A2.png','A#2':'fingering_As2.png','B2':'fingering_B2.png','C2':'fingering_C2.png','C#2':'fingering_Cs2.png','D2':'fingering_D2.png','D#2':'fingering_Ds2.png','E2':'fingering_E2.png','F2':'fingering_F2.png'};
+const STAFF_IMG = {'A':'staff_A.png','A#':'staff_As.png','Bb':'staff_Bb.png','B':'staff_B.png','C':'staff_C.png','C#':'staff_Cs.png','Db':'staff_Db.png','D':'staff_D.png','D#':'staff_Ds.png','Eb':'staff_Eb.png','E':'staff_E.png','F':'staff_F.png','F#':'staff_Fs.png','Gb':'staff_Gb.png','G':'staff_G.png','G#':'staff_Gs.png','Ab':'staff_Ab.png','A2':'staff_A2.png','A#2':'staff_As2.png','Bb2':'staff_Bb2.png','B2':'staff_B2.png','C2':'staff_C2.png','C#2':'staff_Cs2.png','Db2':'staff_Db2.png','D2':'staff_D2.png','D#2':'staff_Ds2.png','Eb2':'staff_Eb2.png','E2':'staff_E2.png','F2':'staff_F2.png'};
+const STAFF_BLANK = 'staff_blank.png';
+const SHARP_TO_FLAT = {'A#':'Bb','C#':'Db','D#':'Eb','F#':'Gb','G#':'Ab','A#2':'Bb2','C#2':'Db2','D#2':'Eb2'};
+
+/* ========= DOM ========= */
+const pianoRoot = document.getElementById('piano');
+const staffImg  = document.getElementById('staff-img');
+const keyFingeringDisplay = document.getElementById('key-fingering-display');
+
+/* ========= 状態 ========= */
+let currentNoteIndex = null;
+
+/* ========= Audio ========= */
+function playNote(freq, dur = 0.45) {
+  if (!audioContext || !freq) return;
+  if (audioContext.state === 'suspended') audioContext.resume();
+  const osc = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+  gain.gain.setValueAtTime(0.5, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + dur);
+  osc.connect(gain); gain.connect(audioContext.destination);
+  osc.start(); osc.stop(audioContext.currentTime + dur);
+}
+
+/* ========= UI Helper ========= */
+function setStaff(key) {
+  staffImg.src = key && STAFF_IMG[key] ? IMG_PATH + STAFF_IMG[key] : IMG_PATH + STAFF_BLANK;
+}
+function highlightKeys(note) {
+  document.querySelectorAll('.piano .white-key, .piano .black-key').forEach(k => k.classList.toggle('active', k.dataset.note === note));
+}
+function createCard(note, label) {
+  const wrap = document.createElement('div');
+  wrap.className = 'card';
+  const lbl = document.createElement('div');
+  lbl.className = 'note-label';
+  lbl.textContent = label;
+  const img = document.createElement('img');
+  img.onerror = () => { img.style.display = 'none'; lbl.style.color = '#888'; lbl.textContent += ' (画像なし)'; };
+  if (note && FINGERING_IMG[note]) { img.src = IMG_PATH + FINGERING_IMG[note]; img.alt = `${note} fingering`; } else { img.style.display = 'none'; }
+  wrap.appendChild(lbl); wrap.appendChild(img);
+  return wrap;
+}
+
+function renderSingle(note) {
+  if (!(note in NOTE_FREQUENCIES)) return;
+  const staffKey = SHARP_TO_FLAT[note] || note;
+  highlightKeys(note);
+  setStaff(staffKey);
+  keyFingeringDisplay.innerHTML = '';
+  const card = createCard(note, staffKey.replace(/b/, '♭').replace(/#/, '♯'));
+  keyFingeringDisplay.appendChild(card);
+  playNote(NOTE_FREQUENCIES[note]);
+  currentNoteIndex = NOTE_TO_INDEX[note];
+}
+
+function moveNote(step) {
+  if (currentNoteIndex === null) {
+      renderSingle(OCARINA_RANGE[0]);
+      return;
+  }
+  const newIdx = currentNoteIndex + step;
+  if (newIdx < 0 || newIdx >= OCARINA_RANGE.length) return;
+  renderSingle(OCARINA_RANGE[newIdx]);
+}
+
+/* ========= Piano Build ========= */
+(function buildPiano() {
+  const whiteKeysData = OCARINA_RANGE.filter(n => !n.includes('#'));
+  const blackKeysData = OCARINA_RANGE.filter(n => n.includes('#'));
+  const whiteKeyElements = {};
+  const noteToDoremi = { 'C': 'ド', 'D': 'レ', 'E': 'ミ', 'F': 'ファ', 'G': 'ソ', 'A': 'ラ', 'B': 'シ' };
+
+  whiteKeysData.forEach(noteName => {
+    const el = document.createElement('div');
+    el.className = 'white-key';
+    el.dataset.note = noteName;
+    el.addEventListener('click', () => renderSingle(noteName));
+    const baseNote = noteName.replace(/[0-9]/, '');
+    const doremiText = noteToDoremi[baseNote];
+    if (doremiText) {
+      const label = document.createElement('div');
+      label.className = 'key-label';
+      label.textContent = doremiText;
+      el.appendChild(label);
+    }
+    pianoRoot.appendChild(el);
+    whiteKeyElements[noteName] = el;
+  });
+
+  blackKeysData.forEach(noteName => {
+    const parentWhiteKeyName = noteName.replace('#', '');
+    const parentElement = whiteKeyElements[parentWhiteKeyName] || whiteKeyElements[parentWhiteKeyName.slice(0, -1)];
+    if (parentElement) {
+      const blackKeyElement = document.createElement('div');
+      blackKeyElement.className = 'black-key';
+      blackKeyElement.dataset.note = noteName;
+      const whiteKeyWidth = 36;
+      const blackKeyWidth = 26;
+      blackKeyElement.style.left = `${parentElement.offsetLeft + whiteKeyWidth - (blackKeyWidth / 2)}px`;
+      blackKeyElement.addEventListener('click', e => {
+        e.stopPropagation();
+        renderSingle(noteName);
+      });
+      pianoRoot.appendChild(blackKeyElement);
+    }
+  });
+})();
+
+/* ========= Keyboard Navigation ========= */
+document.addEventListener('keydown', e => {
+  const isLeft = e.key === 'ArrowLeft';
+  const isRight = e.key === 'ArrowRight';
+  if (!isLeft && !isRight) return;
+  e.preventDefault();
+  moveNote(isLeft ? -1 : 1);
+});
+
+/* ========= Fingering Chart Build ========= */
+(function buildFingeringChart() {
+   const board = document.getElementById('fingering-chart-board');
+   if (!board) return;
+   const noteToDoremi = { 'C': 'ド', 'D': 'レ', 'E': 'ミ', 'F': 'ファ', 'G': 'ソ', 'A': 'ラ', 'B': 'シ' };
+   OCARINA_RANGE.forEach(note => {
+       const card = document.createElement('div');
+       card.className = 'card';
+       card.style.cursor = 'pointer';
+       card.style.justifyContent = 'space-between';
+       const staffKey = SHARP_TO_FLAT[note] || note;
+       const displayName = staffKey.replace(/b/, '♭').replace(/#/, '♯');
+       const baseNote = note.replace(/[0-9#]/, '');
+       const octaveSuffix = note.includes('2') ? '2' : '';
+       const doremi = noteToDoremi[baseNote] || '';
+       const labelText = `${displayName} ${doremi ? `(${doremi}${octaveSuffix})` : ''}`;
+       const lbl = document.createElement('div');
+       lbl.className = 'note-label';
+       lbl.textContent = labelText;
+       const staffImgEl = document.createElement('img');
+       staffImgEl.style.width = '100px';
+       staffImgEl.style.maxHeight = '50px';
+       staffImgEl.style.objectFit = 'contain';
+       staffImgEl.style.border = '1px solid var(--border-color)';
+       staffImgEl.style.borderRadius = '4px';
+       staffImgEl.style.padding = '4px';
+       staffImgEl.style.background = '#fff';
+       if (STAFF_IMG[staffKey]) {
+           staffImgEl.src = IMG_PATH + STAFF_IMG[staffKey];
+           staffImgEl.alt = `${staffKey} on staff`;
+       } else { staffImgEl.style.display = 'none'; }
+       const fingeringImgEl = document.createElement('img');
+       if (FINGERING_IMG[note]) {
+           fingeringImgEl.src = IMG_PATH + FINGERING_IMG[note];
+           fingeringImgEl.alt = `${note} fingering`;
+       } else { fingeringImgEl.style.display = 'none'; }
+       
+       card.addEventListener('click', () => {
+           renderSingle(note);
+           window.scrollTo({ top: 0, behavior: 'smooth' });
+       });
+
+       card.appendChild(lbl);
+       card.appendChild(staffImgEl);
+       card.appendChild(fingeringImgEl);
+       board.appendChild(card);
+   });
+})();
+</script>
+</body>
+</html>
