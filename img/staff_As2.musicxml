@@ -14,14 +14,14 @@
     </scaling>
   </defaults>
   <part-list>
-    <score-part id="P7b79af07570e311e3e5bd6d5ff6b3e3e">
+    <score-part id="Paa607c25b62f4a5b76ea33b6977136d4">
       <part-name />
     </score-part>
   </part-list>
   <!--=========================== Part 1 ===========================-->
-  <part id="P7b79af07570e311e3e5bd6d5ff6b3e3e">
-    <!--========================= Measure 1 ==========================-->
-    <measure implicit="no" number="1">
+  <part id="Paa607c25b62f4a5b76ea33b6977136d4">
+    <!--========================= Measure 0 ==========================-->
+    <measure implicit="no" number="0">
       <attributes>
         <divisions>10080</divisions>
         <time print-object="no">
@@ -37,14 +37,14 @@
         <pitch>
           <step>A</step>
           <alter>1</alter>
-          <octave>5</octave>
+          <octave>4</octave>
         </pitch>
         <duration>40320</duration>
         <type>whole</type>
         <accidental>sharp</accidental>
       </note>
       <barline location="right">
-        <bar-style>light-heavy</bar-style>
+        <bar-style>none</bar-style>
       </barline>
     </measure>
   </part>

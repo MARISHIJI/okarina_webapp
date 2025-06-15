@@ -1,15 +1,19 @@
 import os
-from music21 import stream, note, clef, environment
+from music21 import stream, note, clef, environment, meter, bar # meterとbarを追加
 
 # --------------------------------------------------------------------------
-# 1. MuseScore 4 の場所を指定する設定
+# 1. MuseScore 4 の場所を指定する設定 (環境に合わせて変更してください)
 # --------------------------------------------------------------------------
 env = environment.Environment()
+# Macの場合の例
 env['musicxmlPath'] = '/Applications/MuseScore 4.app/Contents/MacOS/mscore'
 env['musescoreDirectPNGPath'] = '/Applications/MuseScore 4.app/Contents/MacOS/mscore'
+# Windowsの場合の例 (ご自身のインストール場所を確認してください)
+# env['musicxmlPath'] = r'C:\Program Files\MuseScore 4\bin\MuseScore4.exe'
+# env['musescoreDirectPNGPath'] = r'C:\Program Files\MuseScore 4\bin\MuseScore4.exe'
 
 # --------------------------------------------------------------------------
-# 2. HTMLのJavaScriptから定義をコピー
+# 2. ファイル名の定義
 # --------------------------------------------------------------------------
 STAFF_IMG = {
     'A':'staff_A.png', 'A#':'staff_As.png', 'Bb':'staff_Bb.png', 'B':'staff_B.png',
@@ -24,14 +28,14 @@ STAFF_IMG = {
 STAFF_BLANK = 'staff_blank.png'
 
 # --------------------------------------------------------------------------
-# 3. オカリナの音名をmusic21が認識できる音名に変換する対応表
+# 3. 音名の対応表（1オクターブ低い状態）
 # --------------------------------------------------------------------------
 NOTE_MAP = {
-    'A': 'A4', 'A#': 'A#4', 'Bb': 'B-4', 'B': 'B4', 'C': 'C5', 'C#': 'C#5', 'Db': 'D-5',
-    'D': 'D5', 'D#': 'D#5', 'Eb': 'E-5', 'E': 'E5', 'F': 'F5', 'F#': 'F#5', 'Gb': 'G-5',
-    'G': 'G5', 'G#': 'G#5', 'Ab': 'A-5', 'A2': 'A5', 'A#2': 'A#5', 'Bb2': 'B-5', 'B2': 'B5',
-    'C2': 'C6', 'C#2': 'C#6', 'Db2': 'D-6', 'D2': 'D6', 'D#2': 'D#6', 'Eb2': 'E-6',
-    'E2': 'E6', 'F2': 'F6'
+    'A': 'A3', 'A#': 'A#3', 'Bb': 'B-3', 'B': 'B3', 'C': 'C4', 'C#': 'C#4', 'Db': 'D-4',
+    'D': 'D4', 'D#': 'D#4', 'Eb': 'E-4', 'E': 'E4', 'F': 'F4', 'F#': 'F#4', 'Gb': 'G-4',
+    'G': 'G4', 'G#': 'G#4', 'Ab': 'A-4', 'A2': 'A4', 'A#2': 'A#4', 'Bb2': 'B-4', 'B2': 'B4',
+    'C2': 'C5', 'C#2': 'C#5', 'Db2': 'D-5', 'D2': 'D5', 'D#2': 'D#5', 'Eb2': 'E-5',
+    'E2': 'E5', 'F2': 'F5'
 }
 
 # --------------------------------------------------------------------------
@@ -50,25 +54,30 @@ def generate_images():
         if key not in NOTE_MAP:
             print(f"警告: '{key}' の音符マッピングが見つかりません。スキップします。")
             continue
+        
+        # ▼▼▼ ここからが修正箇所 ▼▼▼
+        # Score, Part, Measureという階層で楽譜を明示的に作成する
+        s = stream.Score()
+        p = stream.Part()
+        m = stream.Measure() # 1小節だけを作成
 
-        s = stream.Stream()
-        s.append(clef.TrebleClef())
+        # 拍子記号を作成し、「非表示」に設定
+        ts = meter.TimeSignature('4/4')
+        ts.style.hideObjectOnPrint = True
+        m.append(ts)
+        
+        m.append(clef.TrebleClef())
+        
         n = note.Note(NOTE_MAP[key])
         n.duration.type = 'whole'
-        s.append(n)
-
-        # --- ▼▼▼ ここからが修正箇所 ▼▼▼ ---
-        # music21に自動で小節と拍子記号を作成させる
-        s.makeMeasures(inPlace=True)
+        m.append(n)
         
-        # 作成された拍子記号を取得して「非表示」に設定する
-        ts = s.getTimeSignatures()[0]
-        ts.style.hideObjectOnPrint = True
-
-        # 作成された小節線（左右の縦線）もすべて「非表示」に設定する
-        for bar in s.recurse().getElementsByClass('Barline'):
-            bar.style.hideObjectOnPrint = True
-        # --- ▲▲▲ ここまでが修正箇所 ▲▲▲ ---
+        # 小節の右端の縦線を「なし」に設定
+        m.rightBarline = bar.Barline('none')
+        
+        p.append(m)
+        s.append(p)
+        # ▲▲▲ ここまでが修正箇所 ▲▲▲
 
         filepath = os.path.join(output_dir, filename)
         try:
@@ -79,14 +88,27 @@ def generate_images():
     
     # --- 空の五線譜を生成 ---
     print("\n空の五線譜画像を生成します...")
-    s_blank = stream.Stream()
-    s_blank.append(clef.TrebleClef())
-    s_blank.append(note.Rest(type='whole')) # 適切な余白のため休符を置く
-
-    # 空の五線譜にも同様に非表示処理を適用
-    s_blank.makeMeasures(inPlace=True)
-    for bar in s_blank.recurse().getElementsByClass('Barline'):
-        bar.style.hideObjectOnPrint = True
+    s_blank = stream.Score()
+    p_blank = stream.Part()
+    m_blank = stream.Measure()
+    
+    # こちらも同様に、拍子記号を非表示に
+    ts_blank = meter.TimeSignature('4/4')
+    ts_blank.style.hideObjectOnPrint = True
+    m_blank.append(ts_blank)
+    
+    m_blank.append(clef.TrebleClef())
+    
+    # 幅を確保するために「非表示の」全休符を置く
+    r = note.Rest(type='whole')
+    r.style.hideObjectOnPrint = True
+    m_blank.append(r)
+    
+    # 右端の縦線をなしに
+    m_blank.rightBarline = bar.Barline('none')
+    
+    p_blank.append(m_blank)
+    s_blank.append(p_blank)
 
     filepath_blank = os.path.join(output_dir, STAFF_BLANK)
     try:
@@ -98,11 +120,5 @@ def generate_images():
     print("\nすべての処理が完了しました。")
 
 # --- スクリプトを実行 ---
-if __name__ == '__main__':
-    # 既存のimgフォルダ内の古い画像を削除してから生成開始
-    if os.path.exists('img'):
-        print("既存のimgフォルダ内の古い画像を削除します...")
-        for f in os.listdir('img'):
-            os.remove(os.path.join('img', f))
-    
+if __name__ == '__main__':    
     generate_images()
