@@ -383,7 +383,7 @@ main > p {
 
 <header>
     <div class="container">
-        <h1>Ocarina Fingering Trainer</h1>
+        <h1>Marisii Music</h1>
         <nav class="main-nav">
             <a href="keyboard.html">鍵盤で探す</a>
             <a href="sequence.html" class="current">音名で入力</a>
@@ -515,7 +515,7 @@ main > p {
         }
         const img = document.createElement('img');
         img.onerror = () => { img.style.display = 'none'; lbl.style.color = '#888'; lbl.textContent += ' (画像なし)'; };
-        if (note && FINGERING_IMG[note]) { img.src = IMG_PATH + FINGERING_IMG[note]; img.alt = `${note} fingering`; } else { img.style.display = 'none'; }
+        if (note && FINGERING_IMG[note]) { img.src = IMG_PATH + FINGERING_IMG[note]; img.alt = ``; } else { img.style.display = 'none'; }
         wrap.appendChild(lbl); wrap.appendChild(img);
         return wrap;
     }

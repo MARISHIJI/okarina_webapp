@@ -3,7 +3,7 @@
 <score-partwise version="4.0">
   <identification>
     <encoding>
-      <encoding-date>2025-06-15</encoding-date>
+      <encoding-date>2025-06-17</encoding-date>
       <software>music21 v.9.7.0</software>
     </encoding>
   </identification>
@@ -14,12 +14,12 @@
     </scaling>
   </defaults>
   <part-list>
-    <score-part id="Pbdef7ecd736866bc43fbb4f7a0fb096e">
+    <score-part id="P64401d500e5822bde50798dada3cf45e">
       <part-name />
     </score-part>
   </part-list>
   <!--=========================== Part 1 ===========================-->
-  <part id="Pbdef7ecd736866bc43fbb4f7a0fb096e">
+  <part id="P64401d500e5822bde50798dada3cf45e">
     <!--========================= Measure 0 ==========================-->
     <measure implicit="no" number="0">
       <attributes>
@@ -38,8 +38,14 @@
           <step>E</step>
           <octave>5</octave>
         </pitch>
-        <duration>40320</duration>
-        <type>whole</type>
+        <duration>10080</duration>
+        <type>quarter</type>
+      </note>
+      <note print-object="no" print-spacing="yes">
+        <rest />
+        <duration>30240</duration>
+        <type>half</type>
+        <dot />
       </note>
       <barline location="right">
         <bar-style>none</bar-style>

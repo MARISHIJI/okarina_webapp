@@ -1,5 +1,5 @@
 import os
-from music21 import stream, note, clef, environment, meter, bar # meterとbarを追加
+from music21 import stream, note, clef, environment, meter, bar
 
 # --------------------------------------------------------------------------
 # 1. MuseScore 4 の場所を指定する設定 (環境に合わせて変更してください)
@@ -39,7 +39,22 @@ NOTE_MAP = {
 }
 
 # --------------------------------------------------------------------------
-# 4. 画像を生成するメインの処理
+# 4. 異名同音のペアを定義 (シャープ側: フラット側)
+# --------------------------------------------------------------------------
+ENHARMONIC_PAIRS = {
+    'C#': 'Db',
+    'D#': 'Eb',
+    'F#': 'Gb',
+    'G#': 'Ab',
+    'A#': 'Bb',
+    'C#2': 'Db2',
+    'D#2': 'Eb2',
+    'A#2': 'Bb2'
+}
+
+
+# --------------------------------------------------------------------------
+# 5. 画像を生成するメインの処理
 # --------------------------------------------------------------------------
 def generate_images():
     """必要な五線譜画像をすべて生成する"""
@@ -48,63 +63,103 @@ def generate_images():
         os.makedirs(output_dir)
         print(f"'{output_dir}' フォルダを作成しました。")
 
+    processed_keys = set() # 処理済みのキーを保存するセット
+
     # --- 各音符の五線譜を生成 ---
     print("\n各音符の五線譜画像を生成します...")
     for key, filename in STAFF_IMG.items():
-        if key not in NOTE_MAP:
-            print(f"警告: '{key}' の音符マッピングが見つかりません。スキップします。")
+        if key in processed_keys:
             continue
-        
-        # ▼▼▼ ここからが修正箇所 ▼▼▼
-        # Score, Part, Measureという階層で楽譜を明示的に作成する
+
         s = stream.Score()
         p = stream.Part()
-        m = stream.Measure() # 1小節だけを作成
+        m = stream.Measure()
 
-        # 拍子記号を作成し、「非表示」に設定
         ts = meter.TimeSignature('4/4')
         ts.style.hideObjectOnPrint = True
         m.append(ts)
-        
         m.append(clef.TrebleClef())
-        
-        n = note.Note(NOTE_MAP[key])
-        n.duration.type = 'whole'
-        m.append(n)
-        
-        # 小節の右端の縦線を「なし」に設定
-        m.rightBarline = bar.Barline('none')
-        
-        p.append(m)
-        s.append(p)
-        # ▲▲▲ ここまでが修正箇所 ▲▲▲
 
-        filepath = os.path.join(output_dir, filename)
-        try:
-            s.write('musicxml.png', fp=filepath)
-            print(f"✅ {filename} を生成しました。")
-        except Exception as e:
-            print(f"❌ {filename} の生成に失敗しました。エラー: {e}")
-    
+        if key in ENHARMONIC_PAIRS:
+            sharp_key = key
+            flat_key = ENHARMONIC_PAIRS[sharp_key]
+            
+            print(f"異名同音ペア ({sharp_key} と {flat_key}) を処理します...")
+
+            # シャープ側の音符を作成 (四分音符)
+            n_sharp = note.Note(NOTE_MAP[sharp_key])
+            n_sharp.duration.type = 'quarter'
+            m.append(n_sharp)
+            
+            # フラット側の音符を作成 (四分音符)
+            n_flat = note.Note(NOTE_MAP[flat_key])
+            n_flat.duration.type = 'quarter'
+            m.append(n_flat)
+
+            processed_keys.add(sharp_key)
+            processed_keys.add(flat_key)
+            
+            m.rightBarline = bar.Barline('none')
+            p.append(m)
+            s.append(p)
+
+            filepath_sharp = os.path.join(output_dir, STAFF_IMG[sharp_key])
+            try:
+                s.write('musicxml.png', fp=filepath_sharp)
+                print(f"✅ {STAFF_IMG[sharp_key]} を生成しました。")
+            except Exception as e:
+                print(f"❌ {STAFF_IMG[sharp_key]} の生成に失敗しました。エラー: {e}")
+            
+            filepath_flat = os.path.join(output_dir, STAFF_IMG[flat_key])
+            try:
+                s.write('musicxml.png', fp=filepath_flat)
+                print(f"✅ {STAFF_IMG[flat_key]} を生成しました。")
+            except Exception as e:
+                print(f"❌ {STAFF_IMG[flat_key]} の生成に失敗しました。エラー: {e}")
+
+        else: # 通常の（ペアではない）音符の場合
+            if key not in NOTE_MAP:
+                print(f"警告: '{key}' の音符マッピングが見つかりません。スキップします。")
+                continue
+            
+            # ▼▼▼ ここからが修正箇所 ▼▼▼
+            # 四分音符を作成
+            n = note.Note(NOTE_MAP[key])
+            n.duration.type = 'quarter' # 全音符から四分音符へ変更
+            m.append(n)
+            # ▲▲▲ ここまでが修正箇所 ▲▲▲
+            
+            processed_keys.add(key)
+            
+            m.rightBarline = bar.Barline('none')
+            p.append(m)
+            s.append(p)
+
+            filepath = os.path.join(output_dir, filename)
+            try:
+                s.write('musicxml.png', fp=filepath)
+                print(f"✅ {filename} を生成しました。")
+            except Exception as e:
+                print(f"❌ {filename} の生成に失敗しました。エラー: {e}")
+        
     # --- 空の五線譜を生成 ---
+    # （この部分は変更ありません）
     print("\n空の五線譜画像を生成します...")
     s_blank = stream.Score()
     p_blank = stream.Part()
     m_blank = stream.Measure()
     
-    # こちらも同様に、拍子記号を非表示に
     ts_blank = meter.TimeSignature('4/4')
     ts_blank.style.hideObjectOnPrint = True
     m_blank.append(ts_blank)
-    
     m_blank.append(clef.TrebleClef())
     
     # 幅を確保するために「非表示の」全休符を置く
+    # （これを四分休符にすると画像の幅が狭くなる可能性があるため、全休符のままにします）
     r = note.Rest(type='whole')
     r.style.hideObjectOnPrint = True
     m_blank.append(r)
     
-    # 右端の縦線をなしに
     m_blank.rightBarline = bar.Barline('none')
     
     p_blank.append(m_blank)
@@ -120,5 +175,5 @@ def generate_images():
     print("\nすべての処理が完了しました。")
 
 # --- スクリプトを実行 ---
-if __name__ == '__main__':    
+if __name__ == '__main__':
     generate_images()
