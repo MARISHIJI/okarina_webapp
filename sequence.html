@@ -20,6 +20,9 @@
     --radius: 12px;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.05);
+    /* --- 【追加】オクターブ表示用の色 --- */
+    --high-octave-color: #d93b3b; /* 高い音用の赤 */
+    --low-octave-color: #4a80e2;  /* 低い音用の青 (プライマリカラーと同じ) */
 }
 
 /* --- 基本設定 --- */
@@ -100,11 +103,11 @@ main > p {
     transition: max-height 0s ease-out, opacity 0.4s ease-out, padding 0.5s ease-out, margin 0.5s ease-out;
 }
 .keyboard-section.visible {
-    max-height: 600px;
+    max-height: 600px; /* 十分な高さを確保 */
     opacity: 1;
-    padding: 1rem;
+    padding: 1.5rem;
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem; /* 少し間隔を調整 */
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
@@ -197,7 +200,7 @@ main > p {
     min-height: 150px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     user-select: none; /* ダブルタップ時のテキスト選択を防ぐ */
-    -webkit-tap-highlight-color: transparent; /* 【修正】タップ時のハイライトを無効化 */
+    -webkit-tap-highlight-color: transparent;
 }
 .card.rest-card {
     background: transparent;
@@ -221,7 +224,7 @@ main > p {
     height: auto;
 }
 .note-label {
-    font-weight: 500;
+    font-weight: 700; /* 少し太くして色を際立たせる */
     font-size: 1rem;
 }
 
@@ -355,6 +358,19 @@ main > p {
     .mobile-nav-controls {
         display: flex;
     }
+    
+    .keyboard-section.visible {
+        flex-direction: column; /* 運指表示とピアノを縦に並べる */
+    }
+    .piano-container {
+        width: 100%; /* コンテナを画面幅いっぱいに */
+        overflow-x: auto; /* 横スクロールを有効に */
+        -webkit-overflow-scrolling: touch; /* iOSでの慣性スクロール */
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        background: #fafafa;
+    }
 }
 @media(max-width: 480px) {
     .board {
@@ -387,7 +403,9 @@ main > p {
             <div id="key-fingering-display">
                 <span>キーを押してください</span>
             </div>
-            <div id="piano" class="piano"></div>
+            <div class="piano-container">
+                <div id="piano" class="piano"></div>
+            </div>
         </div>
         <div id="transpose-controls" class="transpose-controls">
             <button id="transpose-down" class="btn">- Key</button>
@@ -412,43 +430,13 @@ main > p {
     const NOTE_FREQUENCIES = {'A':440,'A#':466.16,'B':493.88,'C':523.25,'C#':554.37,'D':587.33,'D#':622.25,'E':659.25,'F':698.46,'F#':739.99,'G':783.99,'G#':830.61,'A2':880,'A#2':932.33,'B2':987.77,'C2':1046.5,'C#2':1108.73,'D2':1174.66,'D#2':1244.51,'E2':1318.51,'F2':1396.91};
     const NOTE_TO_INDEX = Object.fromEntries(OCARINA_RANGE.map((n,i) => [n,i]));
     
-    // 高音域指定(hi, Hi)を追加し、曖昧なキーのマッピングを整理
     const INPUT_TO_NOTE = {
-        // --- ひらがな (低音域) ---
         'ら':'A','ら#':'A#','ら♯':'A#','し':'B','ど':'C','ど#':'C#','ど♯':'C#','れ':'D','れ#':'D#','れ♯':'D#','み':'E','ふぁ':'F','ふぁ#':'F#','ふぁ♯':'F#','そ':'G','そ#':'G#','そ♯':'G#',
-        // --- ひらがな (高音域) ---
         'ら2':'A2','ら#2':'A#2','ら♯2':'A#2','し2':'B2','ど2':'C2','ど#2':'C#2','ど♯2':'C#2','れ2':'D2','れ#2':'D#2','れ♯2':'D#2','み2':'E2','ふぁ2':'F2',
-        'らhi':'A2',  'らHi':'A2',  'らHI':'A2',
-        'ら#hi':'A#2', 'ら#Hi':'A#2', 'ら#HI':'A#2',
-        'ら♯hi':'A#2', 'ら♯Hi':'A#2', 'ら♯HI':'A#2',
-        'しhi':'B2',  'しHi':'B2',  'しHI':'B2',
-        'どhi':'C2',  'どHi':'C2',  'どHI':'C2',
-        'ど#hi':'C#2', 'ど#Hi':'C#2', 'ど#HI':'C#2',
-        'ど♯hi':'C#2', 'ど♯Hi':'C#2', 'ど♯HI':'C#2',
-        'れhi':'D2',  'れHi':'D2',  'れHI':'D2',
-        'れ#hi':'D#2', 'れ#Hi':'D#2', 'れ#HI':'D#2',
-        'れ♯hi':'D#2', 'れ♯Hi':'D#2', 'れ♯HI':'D#2',
-        'みhi':'E2',  'みHi':'E2',  'みHI':'E2',
-        'ふぁhi':'F2',  'ふぁHi':'F2',  'ふぁHI':'F2',
-    
-        // --- カタカナ (低音域) ---
+        'らhi':'A2',  'らHi':'A2',  'らHI':'A2','ら#hi':'A#2', 'ら#Hi':'A#2', 'ら#HI':'A#2','ら♯hi':'A#2', 'ら♯Hi':'A#2', 'ら♯HI':'A#2','しhi':'B2',  'しHi':'B2',  'しHI':'B2','どhi':'C2',  'どHi':'C2',  'どHI':'C2','ど#hi':'C#2', 'ど#Hi':'C#2', 'ど#HI':'C#2','ど♯hi':'C#2', 'ど♯Hi':'C#2', 'ど♯HI':'C#2','れhi':'D2',  'れHi':'D2',  'れHI':'D2','れ#hi':'D#2', 'れ#Hi':'D#2', 'れ#HI':'D#2','れ♯hi':'D#2', 'れ♯Hi':'D#2', 'れ♯HI':'D#2','みhi':'E2',  'みHi':'E2',  'みHI':'E2','ふぁhi':'F2',  'ふぁHi':'F2',  'ふぁHI':'F2',
         'ラ':'A','ラ#':'A#','ラ♯':'A#','シ':'B','ド':'C','ド#':'C#','ド♯':'C#','レ':'D','レ#':'D#','レ♯':'D#','ミ':'E','ファ':'F','ファ#':'F#','ファ♯':'F#','ソ':'G','ソ#':'G#','ソ♯':'G#',
-        // --- カタカナ (高音域) ---
         'ラ2':'A2','ラ#2':'A#2','ラ♯2':'A#2','シ2':'B2','ド2':'C2','ド#2':'C#2','ド♯2':'C#2','レ2':'D2','レ#2':'D#2','レ♯2':'D#2','ミ2':'E2','ファ2':'F2',
-        'ラhi':'A2',  'ラHi':'A2',  'ラHI':'A2',
-        'ラ#hi':'A#2', 'ラ#Hi':'A#2', 'ラ#HI':'A#2',
-        'ラ♯hi':'A#2', 'ラ♯Hi':'A#2', 'ラ♯HI':'A#2',
-        'シhi':'B2',  'シHi':'B2',  'シHI':'B2',
-        'ドhi':'C2',  'ドHi':'C2',  'ドHI':'C2',
-        'ド#hi':'C#2', 'ド#Hi':'C#2', 'ド#HI':'C#2',
-        'ド♯hi':'C#2', 'ド♯Hi':'C#2', 'ド♯HI':'C#2',
-        'レhi':'D2',  'レHi':'D2',  'レHI':'D2',
-        'レ#hi':'D#2', 'レ#Hi':'D#2', 'レ#HI':'D#2',
-        'レ♯hi':'D#2', 'レ♯Hi':'D#2', 'レ♯HI':'D#2',
-        'ミhi':'E2',  'ミHi':'E2',  'ミHI':'E2',
-        'ファhi':'F2',  'ファHi':'F2',  'ファHI':'F2',
-    
-        // --- 英語表記 ---
+        'ラhi':'A2',  'ラHi':'A2',  'ラHI':'A2','ラ#hi':'A#2', 'ラ#Hi':'A#2', 'ラ#HI':'A#2','ラ♯hi':'A#2', 'ラ♯Hi':'A#2', 'ラ♯HI':'A#2','シhi':'B2',  'シHi':'B2',  'シHI':'B2','ドhi':'C2',  'ドHi':'C2',  'ドHI':'C2','ド#hi':'C#2', 'ド#Hi':'C#2', 'ド#HI':'C#2','ド♯hi':'C#2', 'ド♯Hi':'C#2', 'ド♯HI':'C#2','レhi':'D2',  'レHi':'D2',  'レHI':'D2','レ#hi':'D#2', 'レ#Hi':'D#2', 'レ#HI':'D#2','レ♯hi':'D#2', 'レ♯Hi':'D#2', 'レ♯HI':'D#2','ミhi':'E2',  'ミHi':'E2',  'ミHI':'E2','ファhi':'F2',  'ファHi':'F2',  'ファHI':'F2',
         'A':'A','A#':'A#','BB':'A#','B':'B','C':'C','C#':'C#','DB':'C#','D':'D','D#':'D#','EB':'D#','E':'E','F':'F','F#':'F#','GB':'F#','G':'G','G#':'G#','AB':'G#','A2':'A2','A#2':'A#2','BB2':'A#2','B2':'B2','C2':'C2','C#2':'C#2','DB2':'C#2','D2':'D2','D#2':'D#2','EB2':'D#2','E2':'E2','F2':'F2'
     };
     
@@ -502,6 +490,23 @@ main > p {
         const lbl = document.createElement('div');
         lbl.className = 'note-label';
         lbl.textContent = label;
+
+        // --- 【ここから修正】 オクターブによって文字色を変更 ---
+        if (note && note !== 'REST') {
+            const baseWithSharp = note.replace('2', '');
+            const octaveOptions = AMBIGUOUS_NOTE_MAP[baseWithSharp];
+
+            // 複数のオクターブが存在する場合のみ色付け
+            if (octaveOptions && octaveOptions.length > 1) {
+                if (note.includes('2')) {
+                    lbl.style.color = 'var(--high-octave-color)'; // 高い音は赤
+                } else {
+                    lbl.style.color = 'var(--low-octave-color)';  // 低い音は青
+                }
+            }
+        }
+        // --- 【ここまで修正】 ---
+
         if (note === 'REST') {
             wrap.classList.add('rest-card');
             lbl.style.color = 'var(--text-light-color)';
@@ -609,16 +614,13 @@ main > p {
         const cards = boardSeq.querySelectorAll('.card');
         cards.forEach((c, i) => c.classList.toggle('active', i === cardIndex));
     
-        // --- 【ここから修正】 ---
-        // アクティブなカードを画面内にスクロールさせる
         const activeCard = cards[cardIndex];
         if (activeCard) {
             activeCard.scrollIntoView({
-                behavior: 'auto',   // 即時スクロールに変更
-                block: 'center'     // 常に画面中央に配置
+                behavior: 'auto',
+                block: 'center'
             });
         }
-        // --- 【ここまで修正】 ---
     
         const item = originalSequence[index];
         if (item.note === 'REST' || item.note === 'LINEBREAK') return;
@@ -689,7 +691,6 @@ main > p {
         }
     }
     
-    // 前後の音からオクターブを類推する機能を廃止し、指定がなければ低い音をデフォルトにするロジックに変更
     function parseAndResolveSequence(rawText) {
         if (!rawText.trim()) return [];
         const tokenRegex = new RegExp(`(${ESCAPED_KEYS.join('|')})(?:（([^）]+)）)?|([ 　]+)|(\\n)`, 'gi');
@@ -707,21 +708,16 @@ main > p {
             let note = INPUT_TO_NOTE[noteName] || INPUT_TO_NOTE[noteToken];
             if (!note) return null;
     
-            // オクターブ指定がない曖昧な音（例：「ド」）を判定
             const potentialNotes = AMBIGUOUS_NOTE_MAP[note.replace('2', '')];
-          // noteTokenにオクターブ指定子（2, ２, h, H, i, I）が含まれているかチェック
             const isOctaveExplicitlySpecified = /[2２hHiI]/.test(noteToken);
     
-            // 複数のオクターブ候補があり、かつ、入力でオクターブが明示的に指定されていない場合
             if (potentialNotes && potentialNotes.length > 1 && !isOctaveExplicitlySpecified) {
-                // 常に低い方の音（配列の最初の要素）を選択する
                 note = potentialNotes[0];
             }
             
             return { note: note, lyric: lyricToken || '' };
         }).filter(Boolean);
     
-        // 前後の音からの類推ロジックは不要になったため削除
         return resolvedSequence;
     }
     
