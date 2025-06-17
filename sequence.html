@@ -321,7 +321,8 @@ main > p {
     user-select: none;
     opacity: 0.8;
     transition: opacity 0.2s, transform 0.2s;
-    -webkit-tap-highlight-color: transparent; /* 【修正】タップ時のハイライトを無効化 */
+    -webkit-tap-highlight-color: transparent; /* タップ時のハイライトを無効化 */
+    touch-action: manipulation; /* ダブルタップによるズームを無効化 */
 }
 .mobile-nav-btn:hover {
     opacity: 1;
