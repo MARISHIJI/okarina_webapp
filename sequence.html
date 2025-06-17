@@ -197,6 +197,7 @@ main > p {
     min-height: 150px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     user-select: none; /* ダブルタップ時のテキスト選択を防ぐ */
+    -webkit-tap-highlight-color: transparent; /* 【修正】タップ時のハイライトを無効化 */
 }
 .card.rest-card {
     background: transparent;
@@ -294,7 +295,7 @@ main > p {
 .mobile-nav-controls {
     display: none; /* デフォルトは非表示 */
     position: fixed;
-    bottom: 70px;
+    bottom: 20px;
     left: 0;
     right: 0;
     justify-content: space-between;
@@ -320,6 +321,7 @@ main > p {
     user-select: none;
     opacity: 0.8;
     transition: opacity 0.2s, transform 0.2s;
+    -webkit-tap-highlight-color: transparent; /* 【修正】タップ時のハイライトを無効化 */
 }
 .mobile-nav-btn:hover {
     opacity: 1;
@@ -338,9 +340,8 @@ main > p {
     .card img {
         width: 80px;
     }
-    /* 移調コントロールのレイアウト調整とモバイルナビ表示 */
     .transpose-controls {
-        flex-wrap: nowrap; /* 折り返しを防ぐ */
+        flex-wrap: nowrap;
         gap: 0.5rem;
     }
     .transpose-controls .btn {
@@ -555,6 +556,7 @@ function transposeNote(note, step) {
     return OCARINA_RANGE[newIdx];
 }
 
+// --- 【ここから修正】スクロール機能を追加 ---
 function selectSequenceNote(index) {
     if (index < 0 || index >= originalSequence.length) return;
     currentSequenceIndex = index;
@@ -566,6 +568,16 @@ function selectSequenceNote(index) {
     }
     const cards = boardSeq.querySelectorAll('.card');
     cards.forEach((c, i) => c.classList.toggle('active', i === cardIndex));
+
+    // アクティブなカードを画面内にスクロールさせる
+    const activeCard = cards[cardIndex];
+    if (activeCard) {
+        activeCard.scrollIntoView({
+            behavior: 'smooth', // スムーズなアニメーションでスクロール
+            block: 'nearest'    // 最も近い位置にスクロール
+        });
+    }
+
     const item = originalSequence[index];
     if (item.note === 'REST' || item.note === 'LINEBREAK') return;
     const tNote = transposeNote(item.note, transposition);
@@ -573,6 +585,7 @@ function selectSequenceNote(index) {
         playNote(NOTE_FREQUENCIES[tNote]);
     }
 }
+// --- 【ここまで修正】 ---
 
 function renderTransposedSequence() {
     boardSeq.innerHTML = '';
@@ -608,7 +621,6 @@ function renderTransposedSequence() {
         card.style.cursor = 'pointer';
         card.addEventListener('click', () => selectSequenceNote(index));
         
-        // オクターブ変更ロジック(右クリックとダブルクリック)
         const changeOctave = (e) => {
             e.preventDefault();
             const currentItem = originalSequence[index];
@@ -623,8 +635,8 @@ function renderTransposedSequence() {
                 renderTransposedSequence();
             }
         };
-        card.addEventListener('contextmenu', changeOctave); // PC: 右クリック
-        card.addEventListener('dblclick', changeOctave); // Mobile: ダブルクリック
+        card.addEventListener('contextmenu', changeOctave);
+        card.addEventListener('dblclick', changeOctave);
 
         boardSeq.appendChild(card);
     });
@@ -687,8 +699,7 @@ function updateApp() {
     renderTransposedSequence();
 }
 
-// シーケンス移動のための共通関数
-function navigateSequence(direction) { // directionは -1 (前へ) または 1 (次へ)
+function navigateSequence(direction) {
     if (currentSequenceIndex === null || originalSequence.length === 0) return;
     
     let nextIndex = currentSequenceIndex;
