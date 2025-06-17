@@ -422,7 +422,9 @@ document.addEventListener('keydown', e => {
         
         card.addEventListener('click', () => {
             renderSingle(note);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            /* ▼▼▼【変更箇所】 自動スクロールする以下の1行を削除しました ▼▼▼ */
+            // window.scrollTo({ top: 0, behavior: 'smooth' });
+            /* ▲▲▲【変更箇所】▲▲▲ */
         });
 
         card.appendChild(lbl);
