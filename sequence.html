@@ -412,7 +412,6 @@ main > p {
     const NOTE_FREQUENCIES = {'A':440,'A#':466.16,'B':493.88,'C':523.25,'C#':554.37,'D':587.33,'D#':622.25,'E':659.25,'F':698.46,'F#':739.99,'G':783.99,'G#':830.61,'A2':880,'A#2':932.33,'B2':987.77,'C2':1046.5,'C#2':1108.73,'D2':1174.66,'D#2':1244.51,'E2':1318.51,'F2':1396.91};
     const NOTE_TO_INDEX = Object.fromEntries(OCARINA_RANGE.map((n,i) => [n,i]));
     
-    // --- 【ここから修正】 ---
     // 高音域指定(hi, Hi)を追加し、曖昧なキーのマッピングを整理
     const INPUT_TO_NOTE = {
         // --- ひらがな (低音域) ---
@@ -452,7 +451,6 @@ main > p {
         // --- 英語表記 ---
         'A':'A','A#':'A#','BB':'A#','B':'B','C':'C','C#':'C#','DB':'C#','D':'D','D#':'D#','EB':'D#','E':'E','F':'F','F#':'F#','GB':'F#','G':'G','G#':'G#','AB':'G#','A2':'A2','A#2':'A#2','BB2':'A#2','B2':'B2','C2':'C2','C#2':'C#2','DB2':'C#2','D2':'D2','D#2':'D#2','EB2':'D#2','E2':'E2','F2':'F2'
     };
-    // --- 【ここまで修正】 ---
     
     const IMG_PATH = './img/';
     const FINGERING_IMG = {'A':'fingering_A.png','A#':'fingering_As.png','B':'fingering_B.png','C':'fingering_C.png','C#':'fingering_Cs.png','D':'fingering_D.png','D#':'fingering_Ds.png','E':'fingering_E.png','F':'fingering_F.png','F#':'fingering_Fs.png','G':'fingering_G.png','G#':'fingering_Gs.png','A2':'fingering_A2.png','A#2':'fingering_As2.png','B2':'fingering_B2.png','C2':'fingering_C2.png','C#2':'fingering_Cs2.png','D2':'fingering_D2.png','D#2':'fingering_Ds2.png','E2':'fingering_E2.png','F2':'fingering_F2.png'};
@@ -611,14 +609,16 @@ main > p {
         const cards = boardSeq.querySelectorAll('.card');
         cards.forEach((c, i) => c.classList.toggle('active', i === cardIndex));
     
+        // --- 【ここから修正】 ---
         // アクティブなカードを画面内にスクロールさせる
         const activeCard = cards[cardIndex];
         if (activeCard) {
             activeCard.scrollIntoView({
-                behavior: 'smooth', // スムーズなアニメーションでスクロール
-                block: 'nearest'    // 最も近い位置にスクロール
+                behavior: 'auto',   // 即時スクロールに変更
+                block: 'center'     // 常に画面中央に配置
             });
         }
+        // --- 【ここまで修正】 ---
     
         const item = originalSequence[index];
         if (item.note === 'REST' || item.note === 'LINEBREAK') return;
@@ -689,7 +689,6 @@ main > p {
         }
     }
     
-    // --- 【ここから修正】 ---
     // 前後の音からオクターブを類推する機能を廃止し、指定がなければ低い音をデフォルトにするロジックに変更
     function parseAndResolveSequence(rawText) {
         if (!rawText.trim()) return [];
@@ -725,8 +724,6 @@ main > p {
         // 前後の音からの類推ロジックは不要になったため削除
         return resolvedSequence;
     }
-    // --- 【ここまで修正】 ---
-    
     
     function updateApp() {
         const rawText = seqInput.value;
