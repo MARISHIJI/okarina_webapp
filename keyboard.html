@@ -298,7 +298,6 @@ function playNote(freq, dur = 0.45) {
 
 /* ========= UI Helper ========= */
 
-// ▼▼▼【変更箇所】 音の表示名（例: C♯ / D♭）を取得する関数を新設 ▼▼▼
 function getNoteDisplayName(note) {
     if (note in SHARP_TO_FLAT) {
         const sharpName = note.replace('#', '♯');
@@ -307,7 +306,6 @@ function getNoteDisplayName(note) {
     }
     return note.replace('#', '♯');
 }
-// ▲▲▲【変更箇所】▲▲▲
 
 function setStaff(key) {
     staffImg.src = key && STAFF_IMG[key] ? IMG_PATH + STAFF_IMG[key] : IMG_PATH + STAFF_BLANK;
@@ -335,10 +333,8 @@ function renderSingle(note) {
     setStaff(staffKey);
     keyFingeringDisplay.innerHTML = '';
     
-    // ▼▼▼【変更箇所】 新しいヘルパー関数で表示名を取得 ▼▼▼
     const displayName = getNoteDisplayName(note);
     const card = createCard(note, displayName);
-    // ▲▲▲【変更箇所】▲▲▲
 
     keyFingeringDisplay.appendChild(card);
     playNote(NOTE_FREQUENCIES[note]);
@@ -424,13 +420,28 @@ document.addEventListener('keydown', e => {
 
         const staffKey = SHARP_TO_FLAT[note] || note;
         
-        // ▼▼▼【変更箇所】 新しいヘルパー関数で表示名とラベルテキストを作成 ▼▼▼
-        const displayName = getNoteDisplayName(note);
-        const baseNote = note.replace(/[0-9#]/, '');
+        // ▼▼▼【バグ修正】 2オクターブ目の♯系の音名が正しく表示されない問題を修正 ▼▼▼
         const octaveSuffix = note.includes('2') ? '2' : '';
-        const doremi = noteToDoremi[baseNote] || '';
-        const labelText = `${displayName} ${doremi ? `(${doremi}${octaveSuffix})` : ''}`;
-        // ▲▲▲【変更箇所】▲▲▲
+        let labelText = '';
+
+        if (note in SHARP_TO_FLAT) {
+            // シャープ/フラットの音 (例: C#2, A#2)
+            // replaceにgフラグを追加して、音名から記号と数字を"すべて"取り除くように修正
+            const sharpBase = note.replace(/[0-9#]/g, '');
+            const flatNote = SHARP_TO_FLAT[note];
+            const flatBase = flatNote.replace(/[0-9b]/g, '');
+
+            const doremiSharp = noteToDoremi[sharpBase] + '♯';
+            const doremiFlat = noteToDoremi[flatBase] + '♭';
+
+            labelText = `${doremiSharp}${octaveSuffix} / ${doremiFlat}${octaveSuffix}`;
+        } else {
+            // ナチュラルの音 (例: C, B2)
+            const baseNote = note.replace(/[0-9]/g, ''); // こちらも念のためgフラグを追加
+            const doremi = noteToDoremi[baseNote] || '';
+            labelText = `${doremi}${octaveSuffix}`;
+        }
+        // ▲▲▲【修正ここまで】▲▲▲
         
         const lbl = document.createElement('div');
         lbl.className = 'note-label';
