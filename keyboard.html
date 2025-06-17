@@ -418,13 +418,13 @@ document.addEventListener('keydown', e => {
 
         const staffKey = SHARP_TO_FLAT[note] || note;
         
-        // ▼▼▼【バグ修正】 2オクターブ目の♯系の音名が正しく表示されない問題を修正 ▼▼▼
-        const octaveSuffix = note.includes('2') ? '2' : '';
+        // ▼▼▼【ご要望の修正】2オクターブ目の音に「Hi」を追記 ▼▼▼
+        // noteに'2'が含まれていたら'2Hi'を、そうでなければ空文字を接尾辞とする
+        const octaveSuffix = note.includes('2') ? '2Hi' : '';
         let labelText = '';
 
         if (note in SHARP_TO_FLAT) {
             // シャープ/フラットの音 (例: C#2, A#2)
-            // replaceにgフラグを追加して、音名から記号と数字を"すべて"取り除くように修正
             const sharpBase = note.replace(/[0-9#]/g, '');
             const flatNote = SHARP_TO_FLAT[note];
             const flatBase = flatNote.replace(/[0-9b]/g, '');
@@ -435,7 +435,7 @@ document.addEventListener('keydown', e => {
             labelText = `${doremiSharp}${octaveSuffix} / ${doremiFlat}${octaveSuffix}`;
         } else {
             // ナチュラルの音 (例: C, B2)
-            const baseNote = note.replace(/[0-9]/g, ''); // こちらも念のためgフラグを追加
+            const baseNote = note.replace(/[0-9]/g, '');
             const doremi = noteToDoremi[baseNote] || '';
             labelText = `${doremi}${octaveSuffix}`;
         }
