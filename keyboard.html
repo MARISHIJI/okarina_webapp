@@ -94,7 +94,7 @@ main > p {
     border-radius: var(--radius);
     box-shadow: var(--shadow-light);
     padding: 1rem;
-    max-width: 250px;
+    max-width: 320px; /* 少し幅を広げました */
 }
 #key-fingering-display .card {
     box-shadow: none;
@@ -103,6 +103,11 @@ main > p {
 #key-fingering-display span {
     color: var(--text-light-color);
 }
+/* C#/D♭ のように長くなるためフォントサイズを少し調整 */
+#key-fingering-display .note-label {
+    font-size: 1.3rem;
+}
+
 
 /* --- ピアノ + 五線譜 --- */
 .piano-staff {
@@ -192,6 +197,10 @@ main > p {
 .card img { width: 80%; height: auto; }
 .note-label { font-weight: 500; font-size: 1rem; }
 
+.card.is-black-key {
+    background-color: #f1f3f5;
+}
+
 /* --- レスポンシブ --- */
 @media(max-width: 768px) {
     .container { padding: 1rem; }
@@ -199,7 +208,6 @@ main > p {
     .board { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
     .card img { width: 80%; }
 
-    /* ▼▼▼【変更箇所】▼▼▼ */
     .piano-staff {
         padding: 1.5rem;
         flex-direction: column; /* ピアノと五線譜を縦に並べる */
@@ -213,7 +221,6 @@ main > p {
         border-radius: var(--radius);
         background: #fafafa;
     }
-    /* ▲▲▲【変更箇所】▲▲▲ */
 }
 @media(max-width: 480px) {
     .board { grid-template-columns: repeat(2, 1fr); }
@@ -290,6 +297,18 @@ function playNote(freq, dur = 0.45) {
 }
 
 /* ========= UI Helper ========= */
+
+// ▼▼▼【変更箇所】 音の表示名（例: C♯ / D♭）を取得する関数を新設 ▼▼▼
+function getNoteDisplayName(note) {
+    if (note in SHARP_TO_FLAT) {
+        const sharpName = note.replace('#', '♯');
+        const flatName = SHARP_TO_FLAT[note].replace('b', '♭');
+        return `${sharpName} / ${flatName}`;
+    }
+    return note.replace('#', '♯');
+}
+// ▲▲▲【変更箇所】▲▲▲
+
 function setStaff(key) {
     staffImg.src = key && STAFF_IMG[key] ? IMG_PATH + STAFF_IMG[key] : IMG_PATH + STAFF_BLANK;
 }
@@ -315,7 +334,12 @@ function renderSingle(note) {
     highlightKeys(note);
     setStaff(staffKey);
     keyFingeringDisplay.innerHTML = '';
-    const card = createCard(note, staffKey.replace(/b/, '♭').replace(/#/, '♯'));
+    
+    // ▼▼▼【変更箇所】 新しいヘルパー関数で表示名を取得 ▼▼▼
+    const displayName = getNoteDisplayName(note);
+    const card = createCard(note, displayName);
+    // ▲▲▲【変更箇所】▲▲▲
+
     keyFingeringDisplay.appendChild(card);
     playNote(NOTE_FREQUENCIES[note]);
     currentNoteIndex = NOTE_TO_INDEX[note];
@@ -393,12 +417,21 @@ document.addEventListener('keydown', e => {
         card.className = 'card';
         card.style.cursor = 'pointer';
         card.style.justifyContent = 'space-between';
+
+        if (note.includes('#')) {
+            card.classList.add('is-black-key');
+        }
+
         const staffKey = SHARP_TO_FLAT[note] || note;
-        const displayName = staffKey.replace(/b/, '♭').replace(/#/, '♯');
+        
+        // ▼▼▼【変更箇所】 新しいヘルパー関数で表示名とラベルテキストを作成 ▼▼▼
+        const displayName = getNoteDisplayName(note);
         const baseNote = note.replace(/[0-9#]/, '');
         const octaveSuffix = note.includes('2') ? '2' : '';
         const doremi = noteToDoremi[baseNote] || '';
         const labelText = `${displayName} ${doremi ? `(${doremi}${octaveSuffix})` : ''}`;
+        // ▲▲▲【変更箇所】▲▲▲
+        
         const lbl = document.createElement('div');
         lbl.className = 'note-label';
         lbl.textContent = labelText;
@@ -422,9 +455,6 @@ document.addEventListener('keydown', e => {
         
         card.addEventListener('click', () => {
             renderSingle(note);
-            /* ▼▼▼【変更箇所】 自動スクロールする以下の1行を削除しました ▼▼▼ */
-            // window.scrollTo({ top: 0, behavior: 'smooth' });
-            /* ▲▲▲【変更箇所】▲▲▲ */
         });
 
         card.appendChild(lbl);
