@@ -33,28 +33,55 @@ body {
 }
 
 /* --- ヘッダー & ナビゲーション (水色テーマ) --- */
+/* --- ヘッダー & ナビゲーション (ロゴバージョン) --- */
 header {
     background: #fff;
     padding: 1.5rem 0 1rem 0;
+    margin-bottom: 2.5rem;
     border-bottom: 3px dashed var(--border-color);
-    text-align: center;
 }
-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0 0 1.5rem 0;
-    color: rgb(89, 89, 89);
+
+.logo-container {
+    text-align: center; /* ロゴを中央に配置 */
+    margin-bottom: 1.5rem; /* ナビゲーションとの間に余白 */
+}
+
+.site-logo {
+    max-height: 80%; /* ロゴの最大の高さを指定（ここで調整してください） */
+    max-width: 500px;
+    width: auto;      /* 幅は自動調整 */
+    transition: transform 0.3s ease;
+}
+
+.site-logo:hover {
+    transform: scale(1.05); /* ホバー時に少し拡大 */
+}
+
+.main-nav {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
-.header-icon {
-    font-size: 2.2rem;
-    line-height: 1;
-    animation: wave 2.5s ease-in-out infinite;
-    transform-origin: 70% 70%;
-    display: inline-block;
+.main-nav a {
+    text-decoration: none;
+    color: var(--text-light-color);
+    font-weight: 500;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px; /* 錠剤型 */
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.main-nav a:hover {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+    transform: translateY(-3px) scale(1.05);
+}
+.main-nav a.current {
+    color: #fff;
+    background-color: var(--primary-color);
+    font-weight: 700;
+    box-shadow: 0 2px 5px rgba(130, 192, 228, 0.4);
 }
 
 /* アイコンが手を振るアニメーション */
@@ -142,8 +169,8 @@ main > p {
 
 /* --- フッター (水色テーマ) --- */
 .site-footer {
-    padding: 2.5rem 0;
-    margin-top: 4rem;
+    padding: 1.5rem 0;
+    margin-top: 1rem;
     background-color: #fff;
     border-top: 3px dashed var(--border-color);
     color: var(--text-light-color);
@@ -154,4 +181,10 @@ main > p {
 
 .site-footer p {
     margin: 0;
+}
+
+.footer-logo {
+    max-height: 70%; /* ロゴの最大の高さを指定（ここで調整してください） */
+    max-width: 300px;
+    margin-bottom: 1rem;
 }
