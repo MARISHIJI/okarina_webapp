@@ -1,17 +1,9 @@
 /* ========= サンプル曲データ ========= */
 const SAMPLE_SONGS = [
-       { title: 'きらきら星', sequence: 'ドドソソララソ\nファファミミレレド' },
-       { title: 'チューリップ', sequence: 'ドレミドレミ\nソミレドレミレド' },
+       { title: 'きらきら星', sequence: 'ド（き）ド（ら）ソ（き）ソ（ら）ラHi（ひ）ラHi（か）ソ（る）\nファ（お）ファ（そ）ミ（ら）ミ（の）レ（ほ）レ（し）ド（よ）' },
+       { title: 'チューリップ', sequence: 'ド（さ）レ（い）ミ（た）ド（さ）レ（い）ミ（た）\nソ（ちゅー）ミ（りっ）レ（ぷ）ド（の）レ（は）ミ（な）レ（が）\nド（なー）レ（らん）ミ（だー）ド（なー）レ（らん）ミ（だー）\nソ（あ）ミ（か）レ（し）ド（ろ）レ（き）ミ（い）ド（ろ）\nソ（ど）ソ（の）ミ（は）ソ（な）ラHi（み）ラHi（て）ソ（も）\nミ（き）ミ（れ）レ（い）レ（だ）ド（な）' },
        { title: 'メリーさんのひつじ', sequence: 'ミレドレミミミ\nレレレミソソ\nミレドレミミミ\nミレレミレド' },
-       { title: 'エリーゼのために', sequence: 'みれ♯みれ♯みしれどら　どみらし　みどしら' },
-       { title: 'the enternainer', sequence: 'EFGC2GC2GC2C2D2E♭2E2C2D2E2B2D2C2\nEFGC2GC2GC2A2GG♭A2C2E2D2C2A2D2\nEFGC2GC2GC2C2D2E♭2E2C2D2E2B2D2C2\nC2D2E2C2D2E2C2D2C2E2C2D2E2C2D2C2E2C2D2E2B2D2C2' },
-       { title: '冬', sequence: 'どそふぁみれどれそそふぁみれどしふぁふぁみ' },
-       { title: '春', sequence: 'そみみみれどそそふぁみみれどそそふぁみふぁそふぁみれしそ' },
-       { title: 'エリーゼのために', sequence: 'ミファソド2ソド2ソド2ド2レ2ミ♭2ミ2ド2レ2ミ2シ2レ2ド2\n\nミファソド2\nソド2ソド2\n\nラ2ソソ♭ラ2ド2ミ2レ2ド2ラ2レ2\n\nミファソド2ソド2ソド2\nド2レ2ミ♭2ミ2\nド2レ2ミ2シ2レ2ド2\n\nド2レ2ミ2ド2レ2ミ2\nド2レ2ド2ミ2ド2レ2ミ2\nド2レ2ド2ミ2ド2レ2ミ2\nシ2レ2ド2' },
-       { title: 'メリーさんのひつじ', sequence: 'ミレドレミミミ\nレレレミソソ\nミレドレミミミ\nミレレミレド' },
-       { title: 'エリーゼのために', sequence: 'みれ♯みれ♯みしれどら　どみらし　みどしら' },
-       { title: 'メリーさんのひつじ', sequence: 'ミレドレミミミ\nレレレミソソ\nミレドレミミミ\nミレレミレド' },
-       { title: 'エリーゼのために', sequence: 'みれ♯みれ♯みしれどら　どみらし　みどしら' },
+       { title: 'the enternainer', sequence: 'ミファソドHiソドHiソドHi\nドHiレHiレ♯HiミHiドHiレHiミHiシHiレHiドHi\nミファソドHiソドHiソドHi\nラHiソファ♯ラHiドHiミHiレHiドHiラHiレHi\nミファソドHiソドHiソドHi\nドHiレHiレ♯HiミHiドHiレHiミHiシHiレHiドHi\nドHiレHiミHiドHiレHiミHiドHiレHiドHiミHiドHiレHiミHi\nドHiレHiドHiミHiドHiレHiミHiシHiレHiドHi' }
     ];
     
     /* ========= サンプル曲リストの生成 ========= */

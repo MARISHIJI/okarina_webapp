@@ -7,13 +7,19 @@ const NOTE_TO_INDEX = Object.fromEntries(OCARINA_RANGE.map((n,i) => [n,i]));
 const INPUT_TO_NOTE = {
     'ら':'A','ら#':'A#','ら♯':'A#','し':'B','ど':'C','ど#':'C#','ど♯':'C#','れ':'D','れ#':'D#','れ♯':'D#','み':'E','ふぁ':'F','ふぁ#':'F#','ふぁ♯':'F#','そ':'G','そ#':'G#','そ♯':'G#',
     'ら2':'A2','ら#2':'A#2','ら♯2':'A#2','し2':'B2','ど2':'C2','ど#2':'C#2','ど♯2':'C#2','れ2':'D2','れ#2':'D#2','れ♯2':'D#2','み2':'E2','ふぁ2':'F2',
-    'らhi':'A2',  'らHi':'A2',  'らHI':'A2','ら#hi':'A#2', 'ら#Hi':'A#2', 'ら#HI':'A#2','ら♯hi':'A#2', 'ら♯Hi':'A#2', 'ら♯HI':'A#2','しhi':'B2',  'しHi':'B2',  'しHI':'B2','どhi':'C2',  'どHi':'C2',  'どHI':'C2','ど#hi':'C#2', 'ど#Hi':'C#2', 'ど#HI':'C#2','ど♯hi':'C#2', 'ド♯Hi':'C#2', 'ド♯HI':'C#2','れhi':'D2',  'れHi':'D2',  'れHI':'D2','れ#hi':'D#2', 'れ#Hi':'D#2', 'れ#HI':'D#2','れ♯hi':'D#2', 'れ♯Hi':'D#2', 'れ♯HI':'D#2','みhi':'E2',  'みHi':'E2',  'みHI':'E2','ふぁhi':'F2',  'ふぁHi':'F2',  'ふぁHI':'F2',
+    'らhi':'A2',  'らHi':'A2',  'らHI':'A2','ら#hi':'A#2', 'ら#Hi':'A#2', 'ら#HI':'A#2','ら♯hi':'A#2', 'ら♯Hi':'A#2', 'ら♯HI':'A#2','しhi':'B2',  'しHi':'B2',  'しHI':'B2','どhi':'C2',  'どHi':'C2',  'どHI':'C2','ど#hi':'C#2', 'ど#Hi':'C#2', 'ど#HI':'C#2','ど♯hi':'C#2', 'ど♯Hi':'C#2', 'ど♯HI':'C#2','れhi':'D2',  'れHi':'D2',  'れHI':'D2','れ#hi':'D#2', 'れ#Hi':'D#2', 'れ#HI':'D#2','れ♯hi':'D#2', 'れ♯Hi':'D#2', 'れ♯HI':'D#2','みhi':'E2',  'みHi':'E2',  'みHI':'E2','ふぁhi':'F2',  'ふぁHi':'F2',  'ふぁHI':'F2',
     'ラ':'A','ラ#':'A#','ラ♯':'A#','シ':'B','ド':'C','ド#':'C#','ド♯':'C#','レ':'D','レ#':'D#','レ♯':'D#','ミ':'E','ファ':'F','ファ#':'F#','ファ♯':'F#','ソ':'G','ソ#':'G#','ソ♯':'G#',
     'ラ2':'A2','ラ#2':'A#2','ラ♯2':'A#2','シ2':'B2','ド2':'C2','ド#2':'C#2','ド♯2':'C#2','レ2':'D2','レ#2':'D#2','レ♯2':'D#2','ミ2':'E2','ファ2':'F2',
-    'ラhi':'A2',  'ラHi':'A2',  'ラHI':'A2','ラ#hi':'A#2', 'ラ#Hi':'A#2', 'ラ#HI':'A#2','ラ♯hi':'A#2', 'ラ♯Hi':'A#2', 'ラ♯HI':'A#2','シhi':'B2',  'シHi':'B2',  'シHI':'B2','ドhi':'C2',  'ドHi':'C2',  'ドHI':'C2','ド#hi':'C#2', 'ド#Hi':'C#2', 'ド#HI':'C#2','ド♯hi':'C#2', 'ド♯Hi':'C#2', 'ド♯HI':'C#2','レhi':'D2',  'レHi':'D2',  'レHI':'D2','れ#hi':'D#2', 'れ#Hi':'D#2', 'れ#HI':'D#2','れ♯hi':'D#2', 'れ♯Hi':'D#2', 'れ♯HI':'D#2','ミhi':'E2',  'ミHi':'E2',  'ミHI':'E2','ファhi':'F2',  'ファHi':'F2',  'ファHI':'F2',
+    'ラhi':'A2',  'ラHi':'A2',  'ラHI':'A2','ラ#hi':'A#2', 'ラ#Hi':'A#2', 'ラ#HI':'A#2','ラ♯hi':'A#2', 'ラ♯Hi':'A#2', 'ラ♯HI':'A#2','シhi':'B2',  'シHi':'B2',  'シHI':'B2','ドhi':'C2',  'ドHi':'C2',  'ドHI':'C2','ド#hi':'C#2', 'ド#Hi':'C#2', 'ド#HI':'C#2','ド♯hi':'C#2', 'ド♯Hi':'C#2', 'ド♯HI':'C#2','レhi':'D2',  'レHi':'D2',  'レHI':'D2',
+    'レ#hi':'D#2', 'レ#Hi':'D#2', 'レ#HI':'D#2','レ♯hi':'D#2', 'レ♯Hi':'D#2', 'レ♯HI':'D#2',
+    'ミhi':'E2',  'ミHi':'E2',  'ミHI':'E2','ファhi':'F2',  'ファHi':'F2',  'ファHI':'F2',
     'A':'A','A#':'A#','BB':'A#','B':'B','C':'C','C#':'C#','DB':'C#','D':'D','D#':'D#','EB':'D#','E':'E','F':'F','F#':'F#','GB':'F#','G':'G','G#':'G#','AB':'G#','A2':'A2','A#2':'A#2','BB2':'A#2','B2':'B2','C2':'C2','C#2':'C#2','DB2':'C#2','D2':'D2','D#2':'D#2','EB2':'D#2','E2':'E2','F2':'F2',
     'Bb':'A#', 'B♭':'A#', 'Db':'C#', 'D♭':'C#', 'Eb':'D#', 'E♭':'D#', 'Gb':'F#', 'G♭':'F#', 'Ab':'G#', 'A♭':'G#',
     'Bb2':'A#2', 'B♭2':'A#2', 'Db2':'C#2', 'D♭2':'C#2', 'Eb2':'D#2', 'E♭2':'D#2'
+};
+const NOTE_TO_DISPLAY = {
+    'A':'ラ', 'A#':'ラ♯', 'B':'シ', 'C':'ド', 'C#':'ド♯', 'D':'レ', 'D#':'レ♯', 'E':'ミ', 'F':'ファ', 'F#':'ファ♯', 'G':'ソ', 'G#':'ソ♯',
+    'A2':'ラHi', 'A#2':'ラ♯Hi', 'B2':'シHi', 'C2':'ドHi', 'C#2':'ド♯Hi', 'D2':'レHi', 'D#2':'レ♯Hi', 'E2':'ミHi', 'F2':'ファHi'
 };
 const IMG_PATH = './img/';
 const FINGERING_IMG = {'A':'fingering_A.png','A#':'fingering_As.png','B':'fingering_B.png','C':'fingering_C.png','C#':'fingering_Cs.png','D':'fingering_D.png','D#':'fingering_Ds.png','E':'fingering_E.png','F':'fingering_F.png','F#':'fingering_Fs.png','G':'fingering_G.png','G#':'fingering_Gs.png','A2':'fingering_A2.png','A#2':'fingering_As2.png','B2':'fingering_B2.png','C2':'fingering_C2.png','C#2':'fingering_Cs2.png','D2':'fingering_D2.png','D#2':'fingering_Ds2.png','E2':'fingering_E2.png','F2':'fingering_F2.png'};
@@ -78,9 +84,13 @@ function createCard(note, label) {
         }
     }
 
-    if (note === 'REST') {
+    if (note === 'REST' || note === null) { // nullもここで処理
         wrap.classList.add('rest-card');
-        lbl.style.color = 'var(--text-light-color)';
+        if (note === 'REST') {
+            lbl.style.color = 'var(--text-light-color)';
+        } else {
+            lbl.style.color = '#888'; // 音域外などのメッセージ用
+        }
         wrap.appendChild(lbl);
         return wrap;
     }
@@ -96,15 +106,31 @@ function highlightPianoKeys(note) {
     pianoRoot.querySelectorAll('.white-key, .black-key').forEach(k => k.classList.toggle('active', k.dataset.note === note));
 }
 
+// **** CHANGED: This function now applies transposition ****
 function renderSingle(note) {
-    if (!(note in NOTE_FREQUENCIES)) return;
-    const staffKey = SHARP_TO_FLAT[note] || note;
+    // note は押された鍵盤の基本の音名（例: 'C'）
+    
+    // 1. 現在の移調設定を適用する
+    const finalNote = transposeNote(note, transposition);
+
+    // 2. 押された物理的な鍵盤をハイライト表示する
     highlightPianoKeys(note);
     keyFingeringDisplay.innerHTML = '';
-    const card = createCard(note, staffKey.replace(/b/, '♭').replace(/#/, '♯'));
+
+    // 3. 移調した結果、音域外になった場合
+    if (!finalNote) {
+        const card = createCard(null, '音域外');
+        keyFingeringDisplay.appendChild(card);
+        return; // 音は鳴らさない
+    }
+
+    // 4. 移調後の音の運指を表示し、音を鳴らす
+    const disp = NOTE_TO_DISPLAY[finalNote] || finalNote;
+    const card = createCard(finalNote, disp);
     keyFingeringDisplay.appendChild(card);
-    playNote(NOTE_FREQUENCIES[note]);
+    playNote(NOTE_FREQUENCIES[finalNote]);
 }
+
 
 /* --- ピアノ生成ロジック --- */
 function buildPiano() {
@@ -172,8 +198,8 @@ function transposeNote(note, step) {
     return OCARINA_RANGE[newIdx];
 }
 
-/* --- スクロール機能 --- */
-function selectSequenceNote(index) {
+/* --- スクロールと再生機能 --- */
+function selectSequenceNote(index, playSound = true) {
     if (index < 0 || index >= originalSequence.length) return;
     currentSequenceIndex = index;
     let cardIndex = 0;
@@ -196,13 +222,16 @@ function selectSequenceNote(index) {
     const item = originalSequence[index];
     if (item.note === 'REST' || item.note === 'LINEBREAK') return;
     const tNote = transposeNote(item.note, transposition);
-    if (tNote) {
+    
+    if (tNote && playSound) {
         playNote(NOTE_FREQUENCIES[tNote]);
     }
 }
 
 function renderTransposedSequence() {
     boardSeq.innerHTML = '';
+    const lastValidIndex = currentSequenceIndex;
+
     if (originalSequence.length === 0) {
         transposeControls.style.display = 'none';
         return;
@@ -224,7 +253,7 @@ function renderTransposedSequence() {
         } else {
             const tNote = transposeNote(item.note, transposition);
             if (tNote) {
-                const disp = (SHARP_TO_FLAT[tNote] || tNote).replace(/b/, '♭').replace(/#/, '♯');
+                const disp = NOTE_TO_DISPLAY[tNote] || tNote;
                 const lbl = item.lyric ? `${disp}（${item.lyric}）` : disp;
                 card = createCard(tNote, lbl);
             } else {
@@ -233,7 +262,7 @@ function renderTransposedSequence() {
             }
         }
         card.style.cursor = 'pointer';
-        card.addEventListener('click', () => selectSequenceNote(index));
+        card.addEventListener('click', () => selectSequenceNote(index, true));
         
         const changeOctave = (e) => {
             e.preventDefault();
@@ -254,11 +283,9 @@ function renderTransposedSequence() {
 
         boardSeq.appendChild(card);
     });
-    if (currentSequenceIndex !== null && currentSequenceIndex < originalSequence.length) {
-        selectSequenceNote(currentSequenceIndex);
-    } else {
-        const firstValid = originalSequence.findIndex(item => transposeNote(item.note, transposition) !== null && item.note !== 'REST' && item.note !== 'LINEBREAK');
-        if (firstValid !== -1) selectSequenceNote(firstValid);
+
+    if (lastValidIndex !== null && lastValidIndex < originalSequence.length) {
+        selectSequenceNote(lastValidIndex, false);
     }
 }
 
@@ -304,7 +331,13 @@ function updateApp() {
 }
 
 function navigateSequence(direction) {
-    if (currentSequenceIndex === null || originalSequence.length === 0) return;
+    if (currentSequenceIndex === null) {
+        if (direction === 1) {
+            currentSequenceIndex = -1;
+        } else {
+            currentSequenceIndex = originalSequence.length;
+        }
+    }
     
     let nextIndex = currentSequenceIndex;
     do {
@@ -316,7 +349,7 @@ function navigateSequence(direction) {
     );
 
     if (nextIndex >= 0 && nextIndex < originalSequence.length) {
-        selectSequenceNote(nextIndex);
+        selectSequenceNote(nextIndex, true);
     }
 }
 
