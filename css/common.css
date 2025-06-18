@@ -1,0 +1,157 @@
+/* --- デザインシステム (水色テーマ) --- */
+:root {
+    --primary-color: #82c0e4;      /* かわいい水色 */
+    --primary-light: #e0f2fa;     /* 明るい水色 */
+    --background-color: #f7f9fc;  /* 背景色 (ごく薄い青) */
+    --surface-color: #ffffff;     /* カードなどの背景色 */
+    --text-color: #34495e;        /* 文字色 (ダークブルーグレー) */
+    --text-light-color: #8492a6;  /* 淡い文字色 (ブルーグレー) */
+    --border-color: #cce4f2;      /* 境界線 (水色系) */
+    --accent-color: #fdd835;      /* アクセント (黄色) */
+    --radius: 16px;               /* 角丸の半径 (より丸く) */
+    --shadow: 0 4px 10px rgba(130, 192, 228, 0.2); /* 影 (ソフト) */
+    /* オクターブ表示用の色は以前のものを維持 */
+    --high-octave-color: #d93b3b;
+    --low-octave-color: #4a80e2;
+}
+
+/* --- 基本設定 --- */
+* { box-sizing: border-box; }
+body {
+    font-family: "M PLUS Rounded 1c", "Noto Sans JP", system-ui, sans-serif;
+    margin: 0;
+    background: var(--background-color);
+    color: var(--text-color);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+/* --- ヘッダー & ナビゲーション (水色テーマ) --- */
+header {
+    background: #fff;
+    padding: 1.5rem 0 1rem 0;
+    border-bottom: 3px dashed var(--border-color);
+    text-align: center;
+}
+header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    color: rgb(89, 89, 89);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+}
+.header-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+    animation: wave 2.5s ease-in-out infinite;
+    transform-origin: 70% 70%;
+    display: inline-block;
+}
+
+/* アイコンが手を振るアニメーション */
+@keyframes wave {
+    0% { transform: rotate(0deg); }
+    10% { transform: rotate(14deg); }
+    20% { transform: rotate(-8deg); }
+    30% { transform: rotate(14deg); }
+    40% { transform: rotate(-4deg); }
+    50% { transform: rotate(10deg); }
+    60% { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.main-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.main-nav a {
+    text-decoration: none;
+    color: var(--text-light-color);
+    font-weight: 500;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px; /* 錠剤型 */
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+.main-nav a:hover {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+    transform: translateY(-3px) scale(1.05);
+}
+.main-nav a.current {
+    color: #fff;
+    background-color: var(--primary-color);
+    font-weight: 700;
+    box-shadow: 0 2px 5px rgba(130, 192, 228, 0.4);
+}
+
+main { flex: 1; }
+main > p {
+    color: var(--text-light-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+/* --- ボタン (水色テーマ) --- */
+.btn {
+    margin-top: 1rem;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--primary-color);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+    box-shadow: 0 4px 0 #61a5d1; /* ボタンに厚みを出す (暗い水色) */
+    text-decoration: none;
+    display: inline-block;
+}
+.btn:hover {
+    background-color: #95cbed;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #61a5d1;
+}
+.btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #61a5d1;
+}
+
+
+/* --- レスポンシブ (共通) --- */
+@media(max-width: 768px) {
+    .container { padding: 1rem; }
+    header h1 { font-size: 1.5rem; }
+    .header-icon { font-size: 1.8rem; }
+}
+
+
+/* --- フッター (水色テーマ) --- */
+.site-footer {
+    padding: 2.5rem 0;
+    margin-top: 4rem;
+    background-color: #fff;
+    border-top: 3px dashed var(--border-color);
+    color: var(--text-light-color);
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.site-footer p {
+    margin: 0;
+}
