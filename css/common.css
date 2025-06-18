@@ -50,6 +50,7 @@ header {
     max-height: 80%; /* ロゴの最大の高さを指定（ここで調整してください） */
     max-width: 500px;
     width: auto;      /* 幅は自動調整 */
+    margin: 0 auto;
     transition: transform 0.3s ease;
 }
 
@@ -196,4 +197,5 @@ main > p {
     max-height: 70%; /* ロゴの最大の高さを指定（ここで調整してください） */
     max-width: 300px;
     margin-bottom: 1rem;
+    margin: 0 auto;
 }
