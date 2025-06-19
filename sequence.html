@@ -48,7 +48,26 @@
 
 <div class="container">
     <main>
-        <p>音名やドレミを入力すると運指がリアルタイムで表示されます。</p>
+        <div class="help-wrapper">
+            <p>音名やドレミを入力すると運指がリアルタイムで表示されます。<span id="help-icon">?</span></p>
+            <div id="help-bubble">
+                <h4>入力のヒント</h4>
+                <ul class="help-list">
+                    <li><strong>ドレミ</strong>「ド」「レ」「ミ」…</li>
+                    <li><strong>音名</strong>「C」「D」「E」…</li>
+                    <li><strong>シャープ</strong>「ド#」「ド♯」「C#」</li>
+                    <li><strong>フラット</strong>「レb」「レ♭」「Db」</li>
+                    <li><strong>高い音</strong>「ド2」「ドhi」「ドHi」</li>
+                    <li><strong>休符</strong>半角または全角スペース</li>
+                    <li><strong>改行</strong>そのまま改行</li>
+                    <li><strong>歌詞</strong>音の後に括弧で囲む</li>
+                </ul>
+                <p class="help-footer">
+                    音域が2つある音は、カードをダブルクリックか右クリックで切り替えられます。
+                </p>
+            </div>
+        </div>
+
         <div class="seq-wrapper">
             <textarea id="seq-input" rows="4" placeholder="例: ド レ ミ ファ&#10;ソ ラ シ ド"></textarea>
             <button id="toggle-keyboard-btn" class="btn">キーボードを表示</button>

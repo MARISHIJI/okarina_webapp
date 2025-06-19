@@ -44,6 +44,8 @@ const transposeDown = document.getElementById('transpose-down');
 const toggleKeyboardBtn = document.getElementById('toggle-keyboard-btn');
 const mobilePrevBtn = document.getElementById('mobile-prev-btn');
 const mobileNextBtn = document.getElementById('mobile-next-btn');
+const helpIcon = document.getElementById('help-icon');
+const helpBubble = document.getElementById('help-bubble');
 
 /* ========= 状態 ========= */
 let currentSequenceIndex = null;
@@ -106,31 +108,22 @@ function highlightPianoKeys(note) {
     pianoRoot.querySelectorAll('.white-key, .black-key').forEach(k => k.classList.toggle('active', k.dataset.note === note));
 }
 
-// **** CHANGED: This function now applies transposition ****
 function renderSingle(note) {
-    // note は押された鍵盤の基本の音名（例: 'C'）
-    
-    // 1. 現在の移調設定を適用する
     const finalNote = transposeNote(note, transposition);
-
-    // 2. 押された物理的な鍵盤をハイライト表示する
     highlightPianoKeys(note);
     keyFingeringDisplay.innerHTML = '';
 
-    // 3. 移調した結果、音域外になった場合
     if (!finalNote) {
         const card = createCard(null, '音域外');
         keyFingeringDisplay.appendChild(card);
-        return; // 音は鳴らさない
+        return;
     }
-
-    // 4. 移調後の音の運指を表示し、音を鳴らす
+    
     const disp = NOTE_TO_DISPLAY[finalNote] || finalNote;
     const card = createCard(finalNote, disp);
     keyFingeringDisplay.appendChild(card);
     playNote(NOTE_FREQUENCIES[finalNote]);
 }
-
 
 /* --- ピアノ生成ロジック --- */
 function buildPiano() {
@@ -353,14 +346,12 @@ function navigateSequence(direction) {
     }
 }
 
-
 /* ========= イベントリスナー ========= */
 transposeUp.addEventListener('click', () => { transposition++; renderTransposedSequence(); });
 transposeDown.addEventListener('click', () => { transposition--; renderTransposedSequence(); });
 
 mobilePrevBtn.addEventListener('click', () => navigateSequence(-1));
 mobileNextBtn.addEventListener('click', () => navigateSequence(1));
-
 
 document.addEventListener('keydown', e => {
     if (document.activeElement === seqInput) return;
@@ -393,5 +384,20 @@ toggleKeyboardBtn.addEventListener('click', () => {
     } else {
         toggleKeyboardBtn.textContent = 'キーボードを表示';
         highlightPianoKeys(null);
+    }
+});
+
+helpIcon.addEventListener('click', (event) => {
+    // 親要素へのイベント伝播を停止し、documentのクリックイベントが発火しないようにする
+    event.stopPropagation();
+    // 吹き出しの表示・非表示を切り替える
+    helpBubble.classList.toggle('visible');
+});
+
+// 吹き出しの外側をクリックしたときに閉じる処理
+document.addEventListener('click', (event) => {
+    // 吹き出しが表示されていて、かつクリックした場所がアイコンや吹き出しの内部でない場合
+    if (helpBubble.classList.contains('visible') && !helpIcon.contains(event.target) && !helpBubble.contains(event.target)) {
+        helpBubble.classList.remove('visible');
     }
 });
