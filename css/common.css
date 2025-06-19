@@ -1,6 +1,6 @@
 /* --- デザインシステム (水色テーマ) --- */
 :root {
-    --primary-color: #82c0e4;      /* かわいい水色 */
+    --primary-color: #82c0e4;     /* かわいい水色 */
     --primary-light: #e0f2fa;     /* 明るい水色 */
     --background-color: #f7f9fc;  /* 背景色 (ごく薄い青) */
     --surface-color: #ffffff;     /* カードなどの背景色 */
@@ -198,4 +198,79 @@ main > p {
     max-width: 300px;
     margin-bottom: 1rem;
     margin: 0 auto;
+}
+
+/* --- フッターナビゲーション (追加) --- */
+.footer-nav {
+    margin: 1rem 0;
+}
+.footer-nav a {
+    color: var(--text-light-color);
+    text-decoration: none;
+    margin: 0 0.75rem;
+    transition: color 0.2s;
+}
+.footer-nav a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* --- 静的ページ用コンテンツスタイル (追加) --- */
+.article-content {
+    max-width: 800px;
+    margin: 0 auto 2rem auto;
+    background: #fff;
+    padding: 2rem 3rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+.article-content h1 {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+    color: var(--text-color);
+}
+.article-content h2 {
+    font-size: 1.4rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    border-left: 5px solid var(--primary-color);
+    padding-left: 0.8rem;
+    color: var(--text-color);
+}
+.article-content p, .article-content ul {
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    color: var(--text-color); /* main > p の薄い色を上書き */
+}
+.article-content ul {
+    padding-left: 1.5rem;
+}
+.article-content li {
+    margin-bottom: 0.5rem;
+}
+.article-content a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+.article-content a:hover {
+    text-decoration: none;
+}
+.contact-link {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+@media(max-width: 768px) {
+    .article-content {
+        padding: 1.5rem;
+    }
+    .article-content h1 {
+        font-size: 1.5rem;
+    }
+    .article-content h2 {
+        font-size: 1.2rem;
+    }
 }
