@@ -158,7 +158,8 @@ document.addEventListener('keydown', e => {
 
         const staffKey = SHARP_TO_FLAT[note] || note;
         
-        const octaveSuffix = note.includes('2') ? '2Hi' : '';
+        const octaveSuffix = note.includes('2') ? 'Hi' : ''; // <--- 変更箇所
+
         let labelText = '';
 
         if (note in SHARP_TO_FLAT) {
@@ -178,8 +179,8 @@ document.addEventListener('keydown', e => {
         lbl.className = 'note-label';
         lbl.textContent = labelText;
         const staffImgEl = document.createElement('img');
-        staffImgEl.style.width = '100px';
-        staffImgEl.style.maxHeight = '50px';
+        staffImgEl.style.width = '200px';
+        staffImgEl.style.maxHeight = '100px';
         staffImgEl.style.objectFit = 'contain';
         staffImgEl.style.border = '1px solid var(--border-color)';
         staffImgEl.style.borderRadius = '4px';
