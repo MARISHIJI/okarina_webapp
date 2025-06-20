@@ -149,7 +149,7 @@ body {
     box-shadow: none;
 }
 .card img {
-    width: 100px;
+    width: 120px;
     height: auto;
 }
 .note-label {
@@ -373,7 +373,7 @@ body {
         gap: 1rem;
     }
     .card img {
-        width: 80px;
+        width: 120px;
     }
     .transpose-controls {
         flex-wrap: nowrap;
